@@ -1,0 +1,61 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>br.ppgia</groupId>
+	<artifactId>lemas-extractor</artifactId>
+	<version>1.0.o</version>
+	<packaging>jar</packaging>
+
+	<name>lemas-make-data</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>maven2-repository.java.net</id>
+			<name>Java.net Repository for Maven</name>
+			<url>http://download.java.net/maven/2/</url>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>public-repository.jboss.org</id>
+			<name>Public Jboss Repository Group</name>
+			<url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+		</repository>
+		<repository>
+			<id>deprecated-repository.jboss.org</id>
+			<name>JBoss Deprecated</name>
+			<url>https://repository.jboss.org/nexus/content/repositories/deprecated</url>
+		</repository>
+		<repository>
+			<id>serpro.archiva</id>
+			<name>SERPRO Archiva</name>
+			<url>http://archiva.desenv.serpro/repository/internal</url>
+		</repository>
+		<repository>
+			<id>serpro.archiva.component</id>
+			<name>SERPRO Archiva</name>
+			<url>http://archiva.desenv.serpro/repository/component-internal</url>
+		</repository>		
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>edu.uci.ics</groupId>
+			<artifactId>crawler4j</artifactId>
+			<version>3.4</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+</project>
