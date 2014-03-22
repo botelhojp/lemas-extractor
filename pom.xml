@@ -16,6 +16,11 @@
 
 	<repositories>
 		<repository>
+			<id>biblio</id>
+			<name>Biblio</name>
+			<url>http://mirrors.ibiblio.org/pub/mirrors/maven</url>
+		</repository>
+		<repository>
 			<id>maven2-repository.java.net</id>
 			<name>Java.net Repository for Maven</name>
 			<url>http://download.java.net/maven/2/</url>
@@ -40,7 +45,7 @@
 			<id>serpro.archiva.component</id>
 			<name>SERPRO Archiva</name>
 			<url>http://archiva.desenv.serpro/repository/component-internal</url>
-		</repository>		
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -55,7 +60,11 @@
 			<artifactId>crawler4j</artifactId>
 			<version>3.4</version>
 			<type>jar</type>
-			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>2.0</version>
 		</dependency>
 	</dependencies>
 </project>
