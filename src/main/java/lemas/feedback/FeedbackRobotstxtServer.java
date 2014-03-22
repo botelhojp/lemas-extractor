@@ -5,9 +5,9 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 import edu.uci.ics.crawler4j.url.WebURL;
 
-public class LemasRobotstxtServer extends RobotstxtServer{
+public class FeedbackRobotstxtServer extends RobotstxtServer{
 
-	public LemasRobotstxtServer(RobotstxtConfig config, PageFetcher pageFetcher) {
+	public FeedbackRobotstxtServer(RobotstxtConfig config, PageFetcher pageFetcher) {
 		super(config, pageFetcher);		
 	}
 	

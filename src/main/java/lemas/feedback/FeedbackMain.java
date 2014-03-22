@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class LemasMain {
+public class FeedbackMain {
 
 	private static String path = "C:\\Users\\vanderson\\Downloads\\vendedores.txt";
 	private static File file = new File(path);
@@ -14,7 +14,7 @@ public class LemasMain {
 	public static void main(String[] args) throws Exception {
 		
 		
-		new LemasTask(1, 5).run();
+		new FeedbackTask(1, 5).run();
 		
 //		for (int i = 1 ; i <= 1080; i+=1){
 //			int start = ((i-1)*50)+1;
