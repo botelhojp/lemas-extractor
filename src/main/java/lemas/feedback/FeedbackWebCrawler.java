@@ -43,19 +43,23 @@ public class FeedbackWebCrawler extends WebCrawler {
 				return;
 			urlsVisitadas.add(url);
 
-			System.out.println(url);
-
-			String contentDate = new String(page.getContentData());
-
-			InputSource inputSource = new InputSource(new StringReader(contentDate));
-			XPath xPath = XPathFactory.newInstance().newXPath();
-			String _seller = "";
-
-			try {
-				_seller = (String) xPath.evaluate("//span[contains(@role, 'presentation')]//a[1]", inputSource, XPathConstants.STRING);
-			} catch (XPathExpressionException e) {
-				e.printStackTrace();
-			}
+		String _seller = find(new String(page.getContentData()), "Member id(.+?)\\<span class=\"mbg-nw\"\\>(.+?)\\<\\/span\\>", 2, 1);
+		
+		String table = find(new String(page.getContentData()), "FbOuterYukon\"\\>(.+?)\\<\\/table\\>", 1, 1);
+		System.out.println(table);
+		
+		Seller seller = new Seller(FeedbackConfig.ids.get(_seller), _seller, Integer.parseInt("8"));
+		
+		List<String> feedbacks = findall(table, "width=\"16\" alt=\"(.+?) feedback rating");
+		for(int i = 0; i < feedbacks.size(); i ++){
+			String classe = feedbacks.get(i).toLowerCase();
+			String description = find(table, "rating\"\\>\\<\\/td\\>\\<td\\>(.+?)\\<\\/td\\>\\<td", 1, i+1);
+			String from = find(table, "\\<span class=\"mbg-nw\"\\>(.+?)\\<\\/span\\>", 1, i+1);
+			//String fromIteration =  find(table, "\\( (.+?) \\)", 1, i+1);
+			String item =  find(table, "\\<tr class=\"bot\"\\>\\<td\\>&nbsp;\\<\\/td\\>\\<td\\>(.+?)\\(#", 1, i+1);
+			String value = find(table, "US \\$(.+?)<", 1, i+1);
+			String time = find(table, "\\<td nowrap=\"nowrap\"\\>(.+?)<", 1, i+1);
+					
 			
 			String iterations = "";
 			try {
@@ -89,5 +93,29 @@ public class FeedbackWebCrawler extends WebCrawler {
 		// }
 		// }
 		// }
+	}
+
+	private List<String> findall(String contentDate, String pattern) {
+		List<String> l = new ArrayList<String>();
+		Pattern MY_PATTERN = Pattern.compile(pattern);
+		Matcher m = MY_PATTERN.matcher(contentDate);
+		while (m.find()) {
+			System.out.println(m.group(1));
+			l.add(m.group(1));
+		}
+		return l;
+	}
+
+	private String find(String contentDate, String pattern, int group, int _line) {
+		Pattern MY_PATTERN = Pattern.compile(pattern);
+		Matcher m = MY_PATTERN.matcher(contentDate);
+		int line = 0;
+		while (m.find()) {
+			line++;
+			if (line == _line){
+				return m.group(group);	
+			}
+		}
+		throw new RuntimeException("String não encontrada [" + pattern + "]");
 	}
 }

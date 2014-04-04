@@ -15,14 +15,14 @@ public class Feedback {
 
 	public Feedback(String type, String description, String from, String fromIterations, String reputation, String item, String price, String date) {
 		super();
-		this.type = type;
-		this.description = description;
-		this.from = from;
-		this.fromIterations = fromIterations;
-		this.reputation = reputation;
-		this.item = item;
-		this.price = price;
-		this.date = date;
+		this.type = type.trim();
+		this.description = description.trim();
+		this.from = from.trim();
+		this.fromIterations = fromIterations.trim();
+		this.reputation = reputation.trim();
+		this.item = item.trim();
+		this.price = price.trim();
+		this.date = date.trim();
 	}
 
 	public Feedback() {
