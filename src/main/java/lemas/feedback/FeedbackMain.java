@@ -14,7 +14,7 @@ public class FeedbackMain {
 	public static void main(String[] args) throws Exception {
 		
 		
-		new FeedbackTask(1, 5).run();
+		new FeedbackTask(2, 2).run();
 		
 //		for (int i = 1 ; i <= 1080; i+=1){
 //			int start = ((i-1)*50)+1;

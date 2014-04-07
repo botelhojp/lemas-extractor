@@ -24,11 +24,12 @@ import org.xml.sax.InputSource;
 import com.sun.xml.txw2.output.IndentingXMLStreamWriter;
 
 public class Data {
-	
+
 	private static final String tag_seller = "seller";
 	private static final String name = "name";
 	private static final String id = "id";
 	private static final String iterations = "iterations";
+	private static final String status = "status";
 	private static final String feedbacks = "feedbacks";
 	private static final String type = "type";
 	private static final String description = "description";
@@ -39,7 +40,6 @@ public class Data {
 	private static final String reputation = "reputation";
 	private static final String price = "price";
 	private static final String date = "date";
-	
 
 	public static String loadFileToStr(File file) {
 		StringBuilder sb = new StringBuilder();
@@ -72,16 +72,22 @@ public class Data {
 
 					out.writeStartElement(id);
 					{
-						out.writeCharacters(seller.getId()+"");
+						out.writeCharacters(seller.getId() + "");
 					}
 					out.writeEndElement();
 
 					out.writeStartElement(iterations);
 					{
-						out.writeCharacters(seller.getIterations()+"");
+						out.writeCharacters(seller.getIterations() + "");
 					}
-					out.writeEndElement();					
-					
+					out.writeEndElement();
+
+					out.writeStartElement(status);
+					{
+						out.writeCharacters(seller.getStatus() + "");
+					}
+					out.writeEndElement();
+
 					out.writeStartElement(feedbacks);
 					{
 						for (Feedback item : seller.getFeedbacks()) {
@@ -158,49 +164,51 @@ public class Data {
 			while (streamReader.hasNext()) {
 				streamReader.next();
 				if (streamReader.getEventType() == XMLStreamReader.START_ELEMENT) {
-					
+
 					if (streamReader.getLocalName().equals(name)) {
 						seller.setName(streamReader.getElementText());
-					}else
-					if (streamReader.getLocalName().equals(id)) {
+					} else if (streamReader.getLocalName().equals(id)) {
 						seller.setId(Integer.parseInt(streamReader.getElementText()));
-					}else
-					if (streamReader.getLocalName().equals(iterations)) {
+					} else if (streamReader.getLocalName().equals(iterations)) {
 						seller.setIterations(Integer.parseInt(streamReader.getElementText()));
-					}else
-					
+					} else
+
+					if (streamReader.getLocalName().equals(status)) {
+						seller.setStatus(streamReader.getElementText());
+					} else
+
 					if (streamReader.getLocalName().equals(feedback)) {
-						f = new Feedback();						
-					}else
-					
+						f = new Feedback();
+					} else
+
 					if (streamReader.getLocalName().equals(type)) {
-						f.setType(streamReader.getElementText());					
-					}else
-					
+						f.setType(streamReader.getElementText());
+					} else
+
 					if (streamReader.getLocalName().equals(description)) {
-						f.setDescription(streamReader.getElementText());					
-					}else
+						f.setDescription(streamReader.getElementText());
+					} else
 
 					if (streamReader.getLocalName().equals(from)) {
-						f.setFrom(streamReader.getElementText());					
-					}else
+						f.setFrom(streamReader.getElementText());
+					} else
 
 					if (streamReader.getLocalName().equals(from_iterations)) {
-						f.setFromIterations(streamReader.getElementText());					
-					}else
-					
+						f.setFromIterations(streamReader.getElementText());
+					} else
+
 					if (streamReader.getLocalName().equals(reputation)) {
-						f.setReputation(streamReader.getElementText());					
-					}else
-					
+						f.setReputation(streamReader.getElementText());
+					} else
+
 					if (streamReader.getLocalName().equals(tagItem)) {
-						f.setItem(streamReader.getElementText());					
-					}else
-					
+						f.setItem(streamReader.getElementText());
+					} else
+
 					if (streamReader.getLocalName().equals(price)) {
-						f.setPrice(streamReader.getElementText());					
-					}else
-					
+						f.setPrice(streamReader.getElementText());
+					} else
+
 					if (streamReader.getLocalName().equals(date)) {
 						f.setDate(streamReader.getElementText());
 						seller.getFeedbacks().add(f);
@@ -213,28 +221,26 @@ public class Data {
 		}
 	}
 
-	
 	public static void main(String args[]) {
 
-	    String xml = "<resp><status>good</status><msg>hi</msg></resp>";
+		String xml = "<resp><status>good</status><msg>hi</msg></resp>";
 
-	    XPathFactory xpathFactory = XPathFactory.newInstance();
-	    XPath xpath = xpathFactory.newXPath();
+		XPathFactory xpathFactory = XPathFactory.newInstance();
+		XPath xpath = xpathFactory.newXPath();
 
-	    InputSource source = new InputSource(new StringReader(xml));
+		InputSource source = new InputSource(new StringReader(xml));
 
-	    String status = "";
-	    String msg = "";
-	    try {
-	        status = (String) xpath.evaluate("/resp/status", source,XPathConstants.STRING);
-	        msg = (String) xpath.evaluate("/resp/msg", source,XPathConstants.STRING);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+		String status = "";
+		String msg = "";
+		try {
+			status = (String) xpath.evaluate("/resp/status", source, XPathConstants.STRING);
+			msg = (String) xpath.evaluate("/resp/msg", source, XPathConstants.STRING);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-	    System.out.println("status=" + status);
-	    System.out.println("Message=" + msg);
-
+		System.out.println("status=" + status);
+		System.out.println("Message=" + msg);
 
 	}
 }

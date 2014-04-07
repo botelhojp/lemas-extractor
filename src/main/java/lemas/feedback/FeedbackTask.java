@@ -27,7 +27,8 @@ public class FeedbackTask extends Thread {
 
 		try {
 			String crawlStorageFolder = FeedbackConfig.crawlStorageFolder;
-			int numberOfCrawlers = (end-start)+1;
+			//int numberOfCrawlers = (end-start)+1;
+			int numberOfCrawlers = 1;
 
 			CrawlConfig config = new CrawlConfig();
 			config.setCrawlStorageFolder(crawlStorageFolder);
@@ -38,8 +39,6 @@ public class FeedbackTask extends Thread {
 			CrawlController controller;
 
 			controller = new CrawlController(config, pageFetcher, robotstxtServer);
-
-			
 
 			reader = new CSVReader(new FileReader(FeedbackTask.class.getResource("/seller.csv").getFile()));
 			String[] nextLine;

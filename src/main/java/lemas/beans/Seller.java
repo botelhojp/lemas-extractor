@@ -16,6 +16,8 @@ public class Seller {
 	private int id;
 
 	private int iterations;
+	
+	private String status;
 
 	public Seller(int id, String name, int iterations) {
 		this();
@@ -94,5 +96,15 @@ public class Seller {
 		}
 		return new File(folder + File.separatorChar + getId() + "_" + getName() + ".xml");
 	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	
 
 }
