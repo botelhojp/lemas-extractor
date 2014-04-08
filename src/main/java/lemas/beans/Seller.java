@@ -87,14 +87,14 @@ public class Seller {
 		Data.fileToSeller(this, file);
 	}
 
-	private File getFile() {
+	public File getFile() {
 		int folderId = this.id / 1000;
 		String folder = FeedbackConfig.path + folderId;
 		File _folder = new File(folder);
 		if (!_folder.exists()) {
 			_folder.mkdirs();
 		}
-		return new File(folder + File.separatorChar + getId() + "_" + getName() + ".xml");
+		return new File(folder + File.separatorChar + getId() + "_" + getName().replace("*", "_") + ".xml");
 	}
 
 	public String getStatus() {

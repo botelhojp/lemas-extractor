@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import lemas.beans.Seller;
-
 import au.com.bytecode.opencsv.CSVReader;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
@@ -27,8 +26,8 @@ public class FeedbackTask extends Thread {
 
 		try {
 			String crawlStorageFolder = FeedbackConfig.crawlStorageFolder;
-			//int numberOfCrawlers = (end-start)+1;
-			int numberOfCrawlers = 1;
+			// int numberOfCrawlers = (end-start)+1;
+			int numberOfCrawlers = 50;
 
 			CrawlConfig config = new CrawlConfig();
 			config.setCrawlStorageFolder(crawlStorageFolder);
@@ -49,12 +48,14 @@ public class FeedbackTask extends Thread {
 					System.out.println(numero + "[" + seller + "]");
 					FeedbackConfig.ids.put(seller, numero);
 					Seller _seller = new Seller(numero, seller);
-					if (!_seller.complete()){					
-						controller.addSeed("http://feedback.ebay.com/ws/eBayISAPI.dll?ViewFeedback2&ftab=AllFeedback&userid=" + seller + "&items=200");
-					}					
+					if (!_seller.getFile().exists()) {
+						if (!_seller.complete()) {
+							controller.addSeed("http://feedback.ebay.com/ws/eBayISAPI.dll?ViewFeedback2&ftab=AllFeedback&userid=" + seller + "&items=200");
+						}
+					}
 				}
 			}
-			
+
 			controller.start(FeedbackWebCrawler.class, numberOfCrawlers);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

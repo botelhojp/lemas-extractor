@@ -35,7 +35,7 @@ public class FeedbackWebCrawler extends WebCrawler {
 	@Override
 	public void visit(Page page) {
 		String url = page.getWebURL().getURL();
-		if (urlsVisitadas.contains(url) || !url.contains("page="))
+		if (urlsVisitadas.contains(url))
 			return;
 		urlsVisitadas.add(url);
 
@@ -53,26 +53,21 @@ public class FeedbackWebCrawler extends WebCrawler {
 		} else {
 			seller = sellers.get(_seller);
 		}
+		
+		List<String>  table = findLines(contentDate,  "FbOuterYukon", "newPagination");
+		List<String>  lines = findLines(table.get(0),  "height=\"16\" width=\"16\" alt=\"", "View Item");
+		
+		for (String feedback : lines) {
+			String classe = find(feedback, 1, 1, 5000, "alt=\"(.+?) feedback rating");
+			String description = find(feedback, 1, 1, 5000, "rating\"><\\/td><td>(.+?)<\\/td><td");
+			String from = find(feedback, 1, 1, 5000, "<span class=\"mbg-nw\"\\>(.+?)\\<\\/span\\>");
 
-		// String table = find(contentDate,
-		// "FbOuterYukon\"\\>(.+?)\\<\\/table\\>", 1, 1);
-		String table = find(contentDate, 1, 1, Integer.MAX_VALUE, "FbOuterYukon(.+?)Page");
-		//String table = contentDate;
+			String fromIteration = find(feedback, 1, 1, 10, "\\<span class=\"mbg-l\"\\> \\( (.+?)\\) \\<\\/span\\>", "(.+?)\\<img");
+			String Star = find(feedback, 1, 1, 20, "\\<span class=\"mbg-l\"\\> \\( (.+?)\\) \\<\\/span\\>", "icon\\/icon(.+?)_25x25").toLowerCase();
 
-		// System.out.println(table);
-
-		List<String> feedbacks = findall(table, "width=\"16\" alt=\"(.+?) feedback rating");
-		for (int i = 0; i < feedbacks.size(); i++) {
-			String classe = feedbacks.get(i).toLowerCase();
-			String description = find(table, 1, i + 1, 5000, "rating\"\\>\\<\\/td\\>\\<td\\>(.+?)\\<\\/td\\>\\<td");
-			String from = find(table, 1, i + 1, 5000, "\\<span class=\"mbg-nw\"\\>(.+?)\\<\\/span\\>");
-
-			String fromIteration = find(table, 1, i + 1, 10, "\\<span class=\"mbg-l\"\\> \\( (.+?)\\) \\<\\/span\\>", "(.+?)\\<img");
-			String Star = find(table, 1, 1, 20, "\\<span class=\"mbg-l\"\\> \\( (.+?)\\) \\<\\/span\\>", "icon\\/icon(.+?)_25x25").toLowerCase();
-
-			String item = find(table, 1, i + 1, 5000, "\\<tr class=\"bot\"\\>\\<td\\>&nbsp;\\<\\/td\\>\\<td\\>(.+?)\\(#");
-			String value = find(table, 1, i + 1, 5000, "US \\$(.+?)<");
-			String time = find(table, 1, i + 1, 5000, "\\<td nowrap=\"nowrap\"\\>(.+?)<");
+			String item = find(feedback, 1, 1, 5000, "<tr class=\"bot\"><td>&nbsp;<\\/td><td>(.+?)\\(#");
+			String value = find(feedback, 1, 1, 5000, "US \\$(.+?)<");
+			String time = find(feedback, 1, 1, 5000, "\\<td nowrap=\"nowrap\"\\>(.+?)<");
 			seller.getFeedbacks().add(new Feedback(classe, description, from, fromIteration, Star, item, value, time));
 
 		}
@@ -82,14 +77,21 @@ public class FeedbackWebCrawler extends WebCrawler {
 		System.out.println("(" + seller.getName() + ") end");
 	}
 
-	private List<String> findall(String contentDate, String pattern) {
-		List<String> l = new ArrayList<String>();
-		Pattern MY_PATTERN = Pattern.compile(pattern);
-		Matcher m = MY_PATTERN.matcher(contentDate);
-		while (m.find()) {
-			l.add(m.group(1));
+	private List<String> findLines(String contentDate, String start, String end) {
+		List<String> lines = new ArrayList<String>();
+		int index = 0;
+		while(index <= contentDate.length()){
+			int t0 = contentDate.indexOf(start, index);
+			index =  t0 + start.length();
+			int t1 = contentDate.indexOf(end, index);
+			index = t1 + end.length();
+			if (t0 == -1 || t1 == -1){
+				return lines;
+			}
+			lines.add(contentDate.substring(t0, t1));
+			index++;
 		}
-		return l;
+		return lines;
 	}
 
 	private String find(String contentDate, int group, int _line, int size, String... pattern) {

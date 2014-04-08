@@ -56,7 +56,7 @@ public class Data {
 		return sb.toString();
 	}
 
-	public static void sellerToFile(Seller seller, File file) {
+	public synchronized static void sellerToFile(Seller seller, File file) {
 		try {
 			XMLStreamWriter out = XMLOutputFactory.newInstance().createXMLStreamWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
 			out = new IndentingXMLStreamWriter(out);
