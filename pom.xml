@@ -18,7 +18,7 @@
 		<repository>
 			<id>biblio</id>
 			<name>Biblio</name>
-			<url>http://mirrors.ibiblio.org/pub/mirrors/maven</url>
+			<url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
 		</repository>
 		<repository>
 			<id>maven2-repository.java.net</id>
@@ -49,6 +49,12 @@
 	</repositories>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.3</version>
+		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

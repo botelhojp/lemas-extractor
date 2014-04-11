@@ -12,14 +12,19 @@ public class FeedbackMain {
 	private static FileWriter fileWriter;
 
 	public static void main(String[] args) throws Exception {
-		new FeedbackTask(1, 2500).run();
+		for(int i = 0 ; i < 20; i++){
+			new FeedbackTask((i*500+1),((i*500) + 500)).start();
+		}
+		
+//		new FeedbackTask(9501,9501).start();
+		System.out.println("fim");
 	}
 
 	public static void write(String value) {
 		try {
 			fileWriter = new FileWriter(file, true);
 			BufferedWriter bufferFileWriter = new BufferedWriter(fileWriter);
-			fileWriter.append(value+ "\n");
+			fileWriter.append(value + "\n");
 			bufferFileWriter.close();
 			fileWriter.close();
 		} catch (IOException e) {
@@ -27,4 +32,5 @@ public class FeedbackMain {
 		}
 
 	}
+
 }
