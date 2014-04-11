@@ -38,6 +38,7 @@ public class FeedbackTask extends Thread {
 					System.out.println(numero + "[" + seller + "]");
 					FeedbackConfig.ids.put(seller, numero);
 					Seller _seller = new Seller(numero, seller);
+					try{
 					if (!_seller.getFile().exists()) {
 						if (!_seller.complete()) {
 							String url = "http://feedback.ebay.com/ws/eBayISAPI.dll?ViewFeedback2&ftab=AllFeedback&userid=" + seller + "&items=200";
@@ -54,6 +55,9 @@ public class FeedbackTask extends Thread {
 							}
 							_seller.save();
 						}
+					}
+					}catch(java.lang.NumberFormatException e){
+						System.err.println("SEGURANÇA EBAY");
 					}
 				}
 			}

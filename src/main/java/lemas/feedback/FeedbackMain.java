@@ -12,11 +12,12 @@ public class FeedbackMain {
 	private static FileWriter fileWriter;
 
 	public static void main(String[] args) throws Exception {
-		for(int i = 0 ; i < 20; i++){
-			new FeedbackTask((i*500+1),((i*500) + 500)).start();
+		int algo = 1000;
+		int threads = 10;
+		int step = algo/threads;
+		for(int i = 0 ; i < threads; i++){
+			new FeedbackTask((i*step+1),((i*step) + step)).start();
 		}
-		
-//		new FeedbackTask(9501,9501).start();
 		System.out.println("fim");
 	}
 
