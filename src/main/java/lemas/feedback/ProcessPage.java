@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import util.Find;
+
 import lemas.beans.Feedback;
 import lemas.beans.Seller;
 
@@ -31,8 +33,8 @@ public class ProcessPage {
 //			seller = sellers.get(_seller);
 //		}
 
-		List<String> table = findLines(contentDate, "FbOuterYukon", "newPagination");
-		List<String> lines = findLines(table.get(0), "height=\"16\" width=\"16\" alt=\"", "View Item");
+		List<String> table = Find.findLines(contentDate, "FbOuterYukon", "newPagination");
+		List<String> lines = Find.findLines(table.get(0), "height=\"16\" width=\"16\" alt=\"", "<td id=\"viewItemId\">");
 
 		for (String feedback : lines) {
 			String classe = find(feedback, 1, 1, 5000, "alt=\"(.+?) feedback rating");
@@ -53,22 +55,7 @@ public class ProcessPage {
 
 	
 
-	private List<String> findLines(String contentDate, String start, String end) {
-		List<String> lines = new ArrayList<String>();
-		int index = 0;
-		while (index <= contentDate.length()) {
-			int t0 = contentDate.indexOf(start, index);
-			index = t0 + start.length();
-			int t1 = contentDate.indexOf(end, index);
-			index = t1 + end.length();
-			if (t0 == -1 || t1 == -1) {
-				return lines;
-			}
-			lines.add(contentDate.substring(t0, t1));
-			index++;
-		}
-		return lines;
-	}
+	
 
 //	public void onBeforeExit() {
 //		Enumeration<Seller> list = sellers.elements();
