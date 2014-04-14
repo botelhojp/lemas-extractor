@@ -1,4 +1,4 @@
-package lemas.feedback;
+package lemas.commons;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,6 +17,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import lemas.beans.Feedback;
+import lemas.beans.MLSeller;
 import lemas.beans.Seller;
 
 import org.xml.sax.InputSource;
@@ -54,6 +55,106 @@ public class Data {
 			e.printStackTrace();
 		}
 		return sb.toString();
+	}
+	
+	public synchronized static void sellerToFile(MLSeller seller, File file) {
+		try {
+			XMLStreamWriter out = XMLOutputFactory.newInstance().createXMLStreamWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+			out = new IndentingXMLStreamWriter(out);
+			out.writeStartDocument();
+			{
+				out.writeStartElement(tag_seller);
+				{
+					out.writeStartElement(name);
+					{
+						out.writeCharacters(seller.getName());
+					}
+					out.writeEndElement();
+
+					out.writeStartElement(id);
+					{
+						out.writeCharacters(seller.getId() + "");
+					}
+					out.writeEndElement();
+
+					out.writeStartElement(iterations);
+					{
+						out.writeCharacters(seller.getIterations() + "");
+					}
+					out.writeEndElement();
+
+					out.writeStartElement(status);
+					{
+						out.writeCharacters(seller.getStatus() + "");
+					}
+					out.writeEndElement();
+
+					out.writeStartElement(feedbacks);
+					{
+						for (Feedback item : seller.getFeedbacks()) {
+							out.writeStartElement(feedback);
+							{
+								out.writeStartElement(type);
+								{
+									out.writeCharacters(item.getType());
+								}
+								out.writeEndElement();
+
+								out.writeStartElement(description);
+								{
+									out.writeCharacters(item.getDescription());
+								}
+								out.writeEndElement();
+
+								out.writeStartElement(from);
+								{
+									out.writeCharacters(item.getFrom());
+								}
+								out.writeEndElement();
+
+								out.writeStartElement(from_iterations);
+								{
+									out.writeCharacters(item.getFromIterations());
+								}
+								out.writeEndElement();
+
+								out.writeStartElement(reputation);
+								{
+									out.writeCharacters(item.getReputation());
+								}
+								out.writeEndElement();
+
+								out.writeStartElement(tagItem);
+								{
+									out.writeCharacters(item.getItem());
+								}
+								out.writeEndElement();
+
+								out.writeStartElement(price);
+								{
+									out.writeCharacters(item.getPrice());
+								}
+								out.writeEndElement();
+
+								out.writeStartElement(date);
+								{
+									out.writeCharacters(item.getDate());
+								}
+								out.writeEndElement();
+							}
+							out.writeEndElement();
+						}
+					}
+					out.writeEndElement();
+				}
+				out.writeEndElement();
+			}
+			out.writeEndDocument();
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	public synchronized static void sellerToFile(Seller seller, File file) {
@@ -156,7 +257,7 @@ public class Data {
 
 	}
 
-	public static void fileToSeller(Seller seller, File file) {
+	public static void fileToMLSeller(MLSeller seller, File file) {
 		try {
 			Feedback f = new Feedback();
 			XMLInputFactory factory = XMLInputFactory.newInstance();

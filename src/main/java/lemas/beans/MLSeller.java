@@ -7,7 +7,7 @@ import java.util.List;
 import lemas.commons.Data;
 import lemas.commons.LemasConfig;
 
-public class Seller {
+public class MLSeller {
 
 	private String name;
 
@@ -19,18 +19,18 @@ public class Seller {
 	
 	private String status;
 
-	public Seller(int id, String name, int iterations) {
+	public MLSeller(int id, String name, int iterations) {
 		this();
 		this.id = id;
 		this.name = name;
 		this.iterations = iterations;
 	}
 
-	public Seller() {
+	public MLSeller() {
 		feedbacks = new ArrayList<Feedback>();
 	}
 
-	public Seller(int numero, String seller) {
+	public MLSeller(int numero, String seller) {
 		this(numero, seller, 0);
 	}
 
@@ -84,7 +84,7 @@ public class Seller {
 	}
 
 	private void load(File file) {
-		Data.sellerToFile(this, file);
+		Data.fileToMLSeller(this, file);
 	}
 
 	public File getFile() {

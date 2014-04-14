@@ -1,4 +1,4 @@
-package util;
+package lemas.commons;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ public class Find {
 			if (t0 == -1 || t1 == -1) {
 				return lines;
 			}
-			lines.add(contentDate.substring(t0, t1));
+			lines.add(contentDate.substring(t0, t1).replace(start, ""));
 			index++;
 		}
 		return lines;
