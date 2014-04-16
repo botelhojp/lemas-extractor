@@ -1,10 +1,7 @@
 package ml.crawler.ml;
 
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.List;
@@ -12,22 +9,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lemas.beans.Feedback;
-import lemas.beans.Seller;
+import lemas.beans.MLSeller;
 import lemas.commons.Find;
 import lemas.commons.Get;
 import au.com.bytecode.opencsv.CSVReader;
 
 public class MLFeedback {
 
-	private static String path = "C:\\Users\\vanderson\\Downloads\\vendedores.txt";
-	private static File file = new File(path);
-	private static FileWriter fileWriter;
-
 	public static void main(String[] args) throws Exception {
 		int iniciar = 1;
 		int terminar = 999;
 
-		int threads = 1;
+		int threads = 100;
 		
 		int step = terminar / threads;
 		for (int i = 0; i < threads; i++) {
@@ -37,18 +30,6 @@ public class MLFeedback {
 			new FeedbackTask(start, end).start();
 		}
 		System.out.println("fim");
-	}
-
-	public static void write(String value) {
-		try {
-			fileWriter = new FileWriter(file, true);
-			BufferedWriter bufferFileWriter = new BufferedWriter(fileWriter);
-			fileWriter.append(value + "\n");
-			bufferFileWriter.close();
-			fileWriter.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 }
 
@@ -75,7 +56,7 @@ class FeedbackTask extends Thread {
 				if (numero >= start && numero <= end) {
 					System.out.println(numero + "[" + seller + "]");
 					ids.put(seller, numero);
-					Seller _seller = new Seller(numero, seller);
+					MLSeller _seller = new MLSeller(numero, seller);
 					try {
 						if (!_seller.getFile().exists()) {
 							if (!_seller.complete()) {
@@ -115,17 +96,22 @@ class FeedbackTask extends Thread {
 
 class ProcessPage {
 
-	private Seller seller;
+	private MLSeller seller;
 
-	public ProcessPage(Seller seller) {
+	public ProcessPage(MLSeller seller) {
 		this.seller = seller;
 	}
 
 	public void visit(String page) {
 		String contentDate = page;
 
-		String iterations = find(new String(page), 1, 1, 20, "<div id=\"points\"><b>(.+?)<\\/b>");
+		String iterations = find(contentDate, 1, 1, 20, "<div id=\"points\"><b>(.+?)<\\/b>");
+		String date = find(contentDate, 1, 1, 20, "Membro desde:(.+?)<br>");
+		
+		
+		
 		seller.setIterations(Integer.parseInt(iterations));
+		seller.setDate(date);
 
 
 		List<String> lines = Find.findLines(contentDate, "<div id=\"content_box\">", "<div id=\"abajo\" class=\"linea_row\"></div>");
@@ -135,7 +121,7 @@ class ProcessPage {
 			String description = find(feedback, 1, 1, 5000, "<div id=\"box_texto\">(.+?)<\\/div>");
 			String from = find(feedback, 1, 1, 5000, "profile\\?id=(.+?)\\&");
 
-			String fromIteration = "\\.\\.\\.\\((.+?)\\)<";
+			String fromIteration = find(feedback, 1, 1, 5000, "\\.\\.\\.\\((.+?)\\)<");
 			String Star = "";
 
 			String item = find(feedback, 2, 1, 5000, "comprou(.+?)>(.+?)\\.\\.\\.");

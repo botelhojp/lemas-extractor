@@ -77,6 +77,12 @@ public class Data {
 					}
 					out.writeEndElement();
 
+					out.writeStartElement("date");
+					{
+						out.writeCharacters(seller.getDate().trim() + "");
+					}
+					out.writeEndElement();					
+					
 					out.writeStartElement(iterations);
 					{
 						out.writeCharacters(seller.getIterations() + "");
@@ -118,11 +124,11 @@ public class Data {
 								}
 								out.writeEndElement();
 
-								out.writeStartElement(reputation);
-								{
-									out.writeCharacters(item.getReputation());
-								}
-								out.writeEndElement();
+//								out.writeStartElement(reputation);
+//								{
+//									out.writeCharacters(item.getReputation());
+//								}
+//								out.writeEndElement();
 
 								out.writeStartElement(tagItem);
 								{

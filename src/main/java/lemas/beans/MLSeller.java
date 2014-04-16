@@ -10,13 +10,14 @@ import lemas.commons.LemasConfig;
 public class MLSeller {
 
 	private String name;
+	private String date;
 
 	private List<Feedback> feedbacks;
 
 	private int id;
 
 	private int iterations;
-	
+
 	private String status;
 
 	public MLSeller(int id, String name, int iterations) {
@@ -89,12 +90,21 @@ public class MLSeller {
 
 	public File getFile() {
 		int folderId = this.id / 1000;
-		String folder = LemasConfig.path + folderId;
+		String folder = LemasConfig.path + File.separatorChar + folderId;
 		File _folder = new File(folder);
 		if (!_folder.exists()) {
 			_folder.mkdirs();
 		}
-		return new File(folder + File.separatorChar + getId() + "_" + getName().replace("*", "_") + ".xml");
+		return new File(folder + File.separatorChar + add("0", 5, getId()) + "_"
+				+ getName().replace("*", "_") + ".xml");
+	}
+
+	private String add(String token, int count, int value) {
+		String sValue = value + "";
+		while(sValue.length() <= count){
+			sValue = "0" + sValue;
+		}
+		return sValue;
 	}
 
 	public String getStatus() {
@@ -104,7 +114,13 @@ public class MLSeller {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	
-	
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
+	}
 
 }

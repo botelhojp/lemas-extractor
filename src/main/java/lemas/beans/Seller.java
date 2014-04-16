@@ -16,8 +16,10 @@ public class Seller {
 	private int id;
 
 	private int iterations;
-	
+
 	private String status;
+
+	private String date;
 
 	public Seller(int id, String name, int iterations) {
 		this();
@@ -94,7 +96,8 @@ public class Seller {
 		if (!_folder.exists()) {
 			_folder.mkdirs();
 		}
-		return new File(folder + File.separatorChar + getId() + "_" + getName().replace("*", "_") + ".xml");
+		return new File(folder + File.separatorChar + getId() + "_"
+				+ getName().replace("*", "_") + ".xml");
 	}
 
 	public String getStatus() {
@@ -104,7 +107,13 @@ public class Seller {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	
-	
+
+	public void setDate(String date) {
+		this.date = date;
+	}
+
+	public String getDate() {
+		return date;
+	}
 
 }
