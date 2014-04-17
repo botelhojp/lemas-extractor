@@ -65,7 +65,7 @@ class FeedbackTask extends Thread {
 								boolean done = false;
 								while (!done){
 									Thread.sleep(3000);
-									System.out.println(url);
+									System.out.println("[" + numero + "]" + _seller.getName() + ":" + url);
 									String page = new Get(url).getPage();
 									new ProcessPage(_seller).visit(page);
 									
