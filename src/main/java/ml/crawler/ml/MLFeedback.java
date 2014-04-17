@@ -3,6 +3,7 @@ package ml.crawler.ml;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -17,12 +18,12 @@ import au.com.bytecode.opencsv.CSVReader;
 public class MLFeedback {
 
 	public static void main(String[] args) throws Exception {
-		int iniciar = 1;
-		int terminar = 999;
+		int iniciar = 1000;
+		int terminar = 2000;
 
-		int threads = 100;
+		int threads = 1;
 		
-		int step = terminar / threads;
+		int step = (terminar - iniciar) / threads;
 		for (int i = 0; i < threads; i++) {
 			int start = (i * step + 1) + iniciar - 1;
 			int end = ((i * step) + step) + iniciar - 1;
@@ -47,7 +48,7 @@ class FeedbackTask extends Thread {
 	public void run() {
 		CSVReader reader;
 		try {
-			reader = new CSVReader(new FileReader(FeedbackTask.class.getResource("/vendedores-ml.csv").getFile()));
+			reader = new CSVReader( new FileReader(FeedbackTask.class.getResource("/vendedores-ml.csv").getFile()));
 			String[] nextLine;
 			int numero = 0;
 			while ((nextLine = reader.readNext()) != null) {
@@ -63,6 +64,7 @@ class FeedbackTask extends Thread {
 								String url = "http://www.mercadolivre.com.br/jm/profile?id=" + _seller.getName();
 								boolean done = false;
 								while (!done){
+									Thread.sleep(3000);
 									System.out.println(url);
 									String page = new Get(url).getPage();
 									new ProcessPage(_seller).visit(page);
