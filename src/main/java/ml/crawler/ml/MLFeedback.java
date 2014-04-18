@@ -1,9 +1,13 @@
 package ml.crawler.ml;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -18,17 +22,18 @@ import au.com.bytecode.opencsv.CSVReader;
 public class MLFeedback {
 
 	public static void main(String[] args) throws Exception {
-		int iniciar = 1000;
-		int terminar = 2000;
-
-		int threads = 1;
+		System.out.println("java -jar llll 1 1000 10 10000");
+		
+		int iniciar = Integer.parseInt(args[0]);
+		int terminar = Integer.parseInt(args[1]);
+		int threads = Integer.parseInt(args[2]);
 		
 		int step = (terminar - iniciar) / threads;
 		for (int i = 0; i < threads; i++) {
 			int start = (i * step + 1) + iniciar - 1;
 			int end = ((i * step) + step) + iniciar - 1;
 			System.out.println(start + "," + end);
-			new FeedbackTask(start, end).start();
+			new FeedbackTask(start, end, Integer.parseInt(args[3])).start();
 		}
 		System.out.println("fim");
 	}
@@ -38,17 +43,32 @@ class FeedbackTask extends Thread {
 
 	private int start;
 	private int end;
+	private long sleep;
 	public static Hashtable<String, Integer> ids = new Hashtable<String, Integer>();
 
-	public FeedbackTask(int start, int end) {
+	public FeedbackTask(int start, int end, long sleep) {
 		this.start = start;
 		this.end = end;
+		this.sleep = sleep;
 	}
 
 	public void run() {
 		CSVReader reader;
 		try {
-			reader = new CSVReader( new FileReader(FeedbackTask.class.getResource("/vendedores-ml.csv").getFile()));
+			ClassLoader loader = Thread.currentThread().getContextClassLoader();
+			Enumeration<URL> urls = loader.getResources("vendedores-ml.csv");
+			URL _url = (URL) urls.nextElement();
+			System.out.println(_url);
+			InputStream is = _url.openStream();
+			OutputStream os = new FileOutputStream("/tmp/vendedores-ml.csv");
+			byte[] buffer = new byte[1024];
+            while(is.read(buffer) > -1) {
+                os.write(buffer);   
+            }
+            is.close();
+            os.close();
+            
+			reader = new CSVReader( new FileReader("/tmp/vendedores-ml.csv"));
 			String[] nextLine;
 			int numero = 0;
 			while ((nextLine = reader.readNext()) != null) {
@@ -64,7 +84,7 @@ class FeedbackTask extends Thread {
 								String url = "http://www.mercadolivre.com.br/jm/profile?id=" + _seller.getName();
 								boolean done = false;
 								while (!done){
-									Thread.sleep(3000);
+									Thread.sleep(sleep);
 									System.out.println("[" + numero + "]" + _seller.getName() + ":" + url);
 									String page = new Get(url).getPage();
 									new ProcessPage(_seller).visit(page);
