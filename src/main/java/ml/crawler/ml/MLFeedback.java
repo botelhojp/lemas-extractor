@@ -22,7 +22,7 @@ import au.com.bytecode.opencsv.CSVReader;
 public class MLFeedback {
 
 	public static void main(String[] args) throws Exception {
-		System.out.println("java -jar llll 1 1000 10 10000");
+		System.out.println("java -jar lemas-extractor-1.0.o-jar-with-dependencies.jar 1 999 15 2000");
 		
 		int iniciar = Integer.parseInt(args[0]);
 		int terminar = Integer.parseInt(args[1]);
@@ -40,7 +40,8 @@ public class MLFeedback {
 }
 
 class FeedbackTask extends Thread {
-
+	private static int threadcount = 0;
+	private int threadnumber = 0;
 	private int start;
 	private int end;
 	private long sleep;
@@ -50,6 +51,7 @@ class FeedbackTask extends Thread {
 		this.start = start;
 		this.end = end;
 		this.sleep = sleep;
+		threadnumber = ++threadcount; 
 	}
 
 	public void run() {
@@ -81,11 +83,15 @@ class FeedbackTask extends Thread {
 					try {
 						if (!_seller.getFile().exists()) {
 							if (!_seller.complete()) {
-								String url = "http://www.mercadolivre.com.br/jm/profile?id=" + _seller.getName();
+								String url = "http://www.mercadolivre.com.br/jm/profile?id=" + _seller.getName();								
 								boolean done = false;
 								while (!done){
+									double percent = 0.0;
+									if ( _seller.getIterations() > 0 ){
+										percent =  arredondar (((_seller.getFeedbacks().size()*1.00) / (_seller.getIterations() * 1.00)) * 100.00, 1, 1) ;
+									}
 									Thread.sleep(sleep);
-									System.out.println("[" + numero + "]" + _seller.getName() + ":" + url);
+									System.out.println(threadnumber + ", " + percent + "% [" + numero + "]" + _seller.getName() + ":" + url);
 									String page = new Get(url).getPage();
 									new ProcessPage(_seller).visit(page);
 									
@@ -101,7 +107,7 @@ class FeedbackTask extends Thread {
 							}
 						}
 					} catch (java.lang.NumberFormatException e) {
-						System.err.println("SEGURANÇA EBAY");
+						e.printStackTrace();
 					}
 				}
 			}
@@ -114,6 +120,18 @@ class FeedbackTask extends Thread {
 			e.printStackTrace();
 		}
 	}
+	
+	double arredondar(double valor, int casas, int ceilOrFloor) {  
+	    double arredondado = valor;  
+	    arredondado *= (Math.pow(10, casas));  
+	    if (ceilOrFloor == 0) {  
+	        arredondado = Math.ceil(arredondado);             
+	    } else {  
+	        arredondado = Math.floor(arredondado);  
+	    }  
+	    arredondado /= (Math.pow(10, casas));  
+	    return arredondado;  
+	}  
 }
 
 class ProcessPage {
