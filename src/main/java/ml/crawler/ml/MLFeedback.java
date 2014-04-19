@@ -91,7 +91,7 @@ class FeedbackTask extends Thread {
 										percent =  arredondar (((_seller.getFeedbacks().size()*1.00) / (_seller.getIterations() * 1.00)) * 100.00, 1, 1) ;
 									}
 									Thread.sleep(sleep);
-									System.out.println(threadnumber + ", " + percent + "% [" + numero + "]" + _seller.getName() + ":" + url);
+									System.out.println(threadnumber + ": " + percent + "% [" + numero + "]" + _seller.getName() + ":" + url);
 									String page = new Get(url).getPage();
 									new ProcessPage(_seller).visit(page);
 									
