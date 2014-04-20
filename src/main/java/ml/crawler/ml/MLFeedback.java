@@ -1,5 +1,6 @@
 package ml.crawler.ml;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -20,7 +21,9 @@ import lemas.commons.Get;
 import au.com.bytecode.opencsv.CSVReader;
 
 public class MLFeedback {
-
+	
+	public static String folder = System.getProperty( "user.home" );
+			
 	public static void main(String[] args) throws Exception {
 		System.out.println("java -jar lemas-extractor-1.0.o-jar-with-dependencies.jar 1 999 15 2000");
 		
@@ -62,7 +65,7 @@ class FeedbackTask extends Thread {
 			URL _url = (URL) urls.nextElement();
 			System.out.println(_url);
 			InputStream is = _url.openStream();
-			OutputStream os = new FileOutputStream("/tmp/vendedores-ml.csv");
+			OutputStream os = new FileOutputStream(MLFeedback.folder + File.separatorChar + "vendedores-ml.csv");
 			byte[] buffer = new byte[1024];
             while(is.read(buffer) > -1) {
                 os.write(buffer);   
@@ -70,7 +73,7 @@ class FeedbackTask extends Thread {
             is.close();
             os.close();
             
-			reader = new CSVReader( new FileReader("/tmp/vendedores-ml.csv"));
+			reader = new CSVReader( new FileReader(MLFeedback.folder + File.separatorChar + "vendedores-ml.csv"));
 			String[] nextLine;
 			int numero = 0;
 			while ((nextLine = reader.readNext()) != null) {
@@ -91,7 +94,7 @@ class FeedbackTask extends Thread {
 										percent =  arredondar (((_seller.getFeedbacks().size()*1.00) / (_seller.getIterations() * 1.00)) * 100.00, 1, 1) ;
 									}
 									Thread.sleep(sleep);
-									System.out.println(threadnumber + ": " + percent + "% [" + numero + "]" + _seller.getName() + ":" + url);
+									System.out.println(threadnumber + ": " + percent + "% [" + numero + "]" + _seller.getName() + ":" + url + "\n");
 									String page = new Get(url).getPage();
 									new ProcessPage(_seller).visit(page);
 									
