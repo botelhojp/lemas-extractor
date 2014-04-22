@@ -4,7 +4,7 @@
 
 	<groupId>br.ppgia</groupId>
 	<artifactId>lemas-extractor</artifactId>
-	<version>1.0.o</version>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 
 	<name>lemas-make-data</name>

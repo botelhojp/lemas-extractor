@@ -5,8 +5,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
@@ -19,8 +25,11 @@ import javax.xml.xpath.XPathFactory;
 import lemas.beans.Feedback;
 import lemas.beans.MLSeller;
 import lemas.beans.Seller;
+import ml.crawler.ml.MLFeedback;
 
 import org.xml.sax.InputSource;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 import com.sun.xml.txw2.output.IndentingXMLStreamWriter;
 
@@ -41,6 +50,7 @@ public class Data {
 	private static final String reputation = "reputation";
 	private static final String price = "price";
 	private static final String date = "date";
+	private static List<MLSeller> sellers = null;
 
 	public static String loadFileToStr(File file) {
 		StringBuilder sb = new StringBuilder();
@@ -56,7 +66,7 @@ public class Data {
 		}
 		return sb.toString();
 	}
-	
+
 	public synchronized static void sellerToFile(MLSeller seller, File file) {
 		try {
 			XMLStreamWriter out = XMLOutputFactory.newInstance().createXMLStreamWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
@@ -81,8 +91,8 @@ public class Data {
 					{
 						out.writeCharacters(seller.getDate().trim() + "");
 					}
-					out.writeEndElement();					
-					
+					out.writeEndElement();
+
 					out.writeStartElement(iterations);
 					{
 						out.writeCharacters(seller.getIterations() + "");
@@ -124,11 +134,11 @@ public class Data {
 								}
 								out.writeEndElement();
 
-//								out.writeStartElement(reputation);
-//								{
-//									out.writeCharacters(item.getReputation());
-//								}
-//								out.writeEndElement();
+								// out.writeStartElement(reputation);
+								// {
+								// out.writeCharacters(item.getReputation());
+								// }
+								// out.writeEndElement();
 
 								out.writeStartElement(tagItem);
 								{
@@ -349,5 +359,37 @@ public class Data {
 		System.out.println("status=" + status);
 		System.out.println("Message=" + msg);
 
+	}
+
+	public static synchronized List<MLSeller> getSellers() {
+		try {
+			if (sellers == null) {
+				sellers = new ArrayList<MLSeller>();
+				ClassLoader loader = Thread.currentThread().getContextClassLoader();
+				Enumeration<URL> urls = loader.getResources("vendedores-ml.csv");
+				URL _url = (URL) urls.nextElement();
+				System.out.println(_url);
+				InputStream is = _url.openStream();
+				OutputStream os = new FileOutputStream(MLFeedback.folder + File.separatorChar + "vendedores-ml.csv");
+				byte[] buffer = new byte[1024];
+				while (is.read(buffer) > -1) {
+					os.write(buffer);
+				}
+				is.close();
+				os.close();
+
+				CSVReader reader = new CSVReader(new FileReader(MLFeedback.folder + File.separatorChar + "vendedores-ml.csv"));
+				String[] nextLine;
+				int numero = 0;
+				while ((nextLine = reader.readNext()) != null) {
+					sellers.add(new MLSeller(++numero, nextLine[0]));
+				}
+				reader.close();
+			}
+			return sellers;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
