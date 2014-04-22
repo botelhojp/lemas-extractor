@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import lemas.beans.Feedback;
 import lemas.beans.MLSeller;
-import lemas.beans.Seller;
 import lemas.commons.Data;
 import lemas.commons.Find;
 import lemas.commons.Get;
