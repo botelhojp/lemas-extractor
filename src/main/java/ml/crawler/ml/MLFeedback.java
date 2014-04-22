@@ -15,16 +15,22 @@ import lemas.commons.LemasConfig;
 public class MLFeedback {
 
 	public static String folder = System.getProperty("user.home");
+	public static int count1 = 0;
+	public static int count2 = 0;
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("java -jar lemas-extractor-1.0.o-jar-with-dependencies.jar 1 999 15 2000");
 
 		if (args[0].equals("verify")) {
 			verify(LemasConfig.path + File.separatorChar);
+			System.out.println("analisados: " + count1);
+			System.out.println("deletados: " + count2);
 		} else {
 			int iniciar = Integer.parseInt(args[0]);
 			int terminar = Integer.parseInt(args[1]);
 			int threads = Integer.parseInt(args[2]);
+			
+			boolean save = (args.length == 5) ? Boolean.parseBoolean(args[4]) : false;
 
 			int step = (terminar - iniciar) / threads;
 
@@ -32,7 +38,7 @@ public class MLFeedback {
 				int start = (i * step + 1) + iniciar - 1;
 				int end = ((i * step) + step) + iniciar - 1;
 				System.out.println(start + "," + end);
-				new FeedbackTask(start, end, Integer.parseInt(args[3])).start();
+				new FeedbackTask(start, end, Integer.parseInt(args[3]), save).start();
 			}
 			System.out.println("fim");
 		}
@@ -47,11 +53,13 @@ public class MLFeedback {
 			if (f.isDirectory()) {
 				verify(f.getAbsolutePath());
 			} else {
+				count1++;
 				System.out.print("verify:" + f.getAbsoluteFile());
-				if (!findSeller(f)){
+				if (!findSeller(f)){					
 					System.out.println("   DELETED");
 					f.delete();
-				}else{
+					count2++;
+				}else{					
 					System.out.println("   OK");
 				}
 			}
@@ -74,14 +82,16 @@ class FeedbackTask extends Thread {
 	private int start;
 	private int end;
 	private long sleep;
+	private boolean save;
 
 	// public static Hashtable<String, Integer> ids = new Hashtable<String,
 	// Integer>();
 
-	public FeedbackTask(int start, int end, long sleep) {
+	public FeedbackTask(int start, int end, long sleep, boolean save) {
 		this.start = start;
 		this.end = end;
 		this.sleep = sleep;
+		this.save = save;
 		threadnumber = ++threadcount;
 	}
 
@@ -114,6 +124,10 @@ class FeedbackTask extends Thread {
 									if (index.size() == 1) {
 										int _page = (Integer.parseInt(index.get(0)) * 25) + 1;
 										url = "http://www.mercadolivre.com.br/jm/profile?act=ver&id=" + _seller.getName() + "&baseLista=" + _page + "&tipo=0&oper=B&orden=1#head_califs";
+										if (save){
+											System.out.println("save");
+											_seller.save();
+										}
 									} else {
 										done = true;
 									}
