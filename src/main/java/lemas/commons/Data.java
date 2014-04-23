@@ -273,68 +273,69 @@ public class Data {
 
 	}
 
-	public static void fileToMLSeller(MLSeller seller, File file) {
+	public static MLSeller fileToMLSeller(MLSeller seller, File file) {
 		try {
-			Feedback f = new Feedback();
+			
 			XMLInputFactory factory = XMLInputFactory.newInstance();
 			XMLStreamReader streamReader = factory.createXMLStreamReader(new FileReader(file));
+			Feedback f = null ;
 			while (streamReader.hasNext()) {
-				streamReader.next();
-				if (streamReader.getEventType() == XMLStreamReader.START_ELEMENT) {
-
+				streamReader.next();				
+				if (streamReader.getEventType() == XMLStreamReader.START_ELEMENT) {						
 					if (streamReader.getLocalName().equals(name)) {
 						seller.setName(streamReader.getElementText());
-					} else if (streamReader.getLocalName().equals(id)) {
+					}
+					if (streamReader.getLocalName().equals(id)) {
 						seller.setId(Integer.parseInt(streamReader.getElementText()));
-					} else if (streamReader.getLocalName().equals(iterations)) {
+					}
+					if (streamReader.getLocalName().equals("date") && f == null) {
+						seller.setDate(streamReader.getElementText());
+					}
+					if (streamReader.getLocalName().equals(iterations)) {
 						seller.setIterations(Integer.parseInt(streamReader.getElementText()));
-					} else
-
+					}
 					if (streamReader.getLocalName().equals(status)) {
 						seller.setStatus(streamReader.getElementText());
-					} else
-
+					}
 					if (streamReader.getLocalName().equals(feedback)) {
 						f = new Feedback();
-					} else
-
+					}
 					if (streamReader.getLocalName().equals(type)) {
 						f.setType(streamReader.getElementText());
-					} else
-
+					}
 					if (streamReader.getLocalName().equals(description)) {
-						f.setDescription(streamReader.getElementText());
-					} else
-
+						try {
+							f.setDescription(streamReader.getElementText());
+						} catch (javax.xml.stream.XMLStreamException e) {
+							e.printStackTrace();
+						}
+					}
 					if (streamReader.getLocalName().equals(from)) {
 						f.setFrom(streamReader.getElementText());
-					} else
-
+					}
 					if (streamReader.getLocalName().equals(from_iterations)) {
 						f.setFromIterations(streamReader.getElementText());
-					} else
-
+					}
 					if (streamReader.getLocalName().equals(reputation)) {
 						f.setReputation(streamReader.getElementText());
-					} else
-
+					}
 					if (streamReader.getLocalName().equals(tagItem)) {
 						f.setItem(streamReader.getElementText());
-					} else
-
+					}
 					if (streamReader.getLocalName().equals(price)) {
 						f.setPrice(streamReader.getElementText());
-					} else
-
-					if (streamReader.getLocalName().equals(date)) {
+					}
+					if (streamReader.getLocalName().equals(date) && f != null) {
 						f.setDate(streamReader.getElementText());
 						seller.getFeedbacks().add(f);
 					}
 				}
 			}
 			streamReader.close();
+			return seller;
 		} catch (Exception e) {
 			e.printStackTrace();
+			return null;
 		}
 	}
 

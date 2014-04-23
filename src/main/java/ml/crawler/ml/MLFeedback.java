@@ -29,7 +29,7 @@ public class MLFeedback {
 			int iniciar = Integer.parseInt(args[0]);
 			int terminar = Integer.parseInt(args[1]);
 			int threads = Integer.parseInt(args[2]);
-			
+
 			boolean save = (args.length == 5) ? Boolean.parseBoolean(args[4]) : false;
 
 			int step = (terminar - iniciar) / threads;
@@ -55,11 +55,11 @@ public class MLFeedback {
 			} else {
 				count1++;
 				System.out.print("verify:" + f.getAbsoluteFile());
-				if (!findSeller(f)){					
+				if (!findSeller(f)) {
 					System.out.println("   DELETED");
 					f.delete();
 					count2++;
-				}else{					
+				} else {
 					System.out.println("   OK");
 				}
 			}
@@ -67,8 +67,8 @@ public class MLFeedback {
 	}
 
 	private static boolean findSeller(File f) {
-		for(MLSeller seller : Data.getSellers()){
-			if (seller.getFile().getAbsolutePath().equals(f.getAbsolutePath())){
+		for (MLSeller seller : Data.getSellers()) {
+			if (seller.getFile().getAbsolutePath().equals(f.getAbsolutePath())) {
 				return true;
 			}
 		}
@@ -106,34 +106,43 @@ class FeedbackTask extends Thread {
 					System.out.println(numero + "[" + seller.getName() + "]");
 					MLSeller _seller = new MLSeller(seller.getId(), seller.getName());
 					try {
-						if (!_seller.getFile().exists()) {
-							if (!_seller.complete()) {
-								String url = "http://www.mercadolivre.com.br/jm/profile?id=" + _seller.getName();
-								boolean done = false;
-								while (!done) {
-									double percent = 0.0;
-									if (_seller.getIterations() > 0) {
-										percent = arredondar(((_seller.getFeedbacks().size() * 1.00) / (_seller.getIterations() * 1.00)) * 100.00, 1, 1);
-									}
-									Thread.sleep(sleep);
-									System.out.println(threadnumber + ": " + percent + "% [" + numero + "]" + _seller.getName() + ":" + url + "\n");
-									String page = new Get(url).getPage();
-									new ProcessPage(_seller).visit(page);
+						if (save) {
+							_seller.load();
+						}
+						if (!_seller.getFile().exists() || save) {
+							String url = "";
+							if (save) {
+								int _page = (((_seller.getFeedbacks().size() / 25) + 1) * 25) + 1;
+								url = "http://www.mercadolivre.com.br/jm/profile?act=ver&id=" + _seller.getName() + "&baseLista=" + _page + "&tipo=0&oper=B&orden=1#head_califs";
+							} else {
+								url = "http://www.mercadolivre.com.br/jm/profile?id=" + _seller.getName();
+							}
+							boolean done = false;
+							while (!done) {
+								double percent = 0.0;
+								if (_seller.getIterations() > 0) {
+									percent = arredondar(((_seller.getFeedbacks().size() * 1.00) / (_seller.getIterations() * 1.00)) * 100.00, 1, 1);
+								}
+								Thread.sleep(sleep);
+								System.out.println(threadnumber + ": " + percent + "% [" + numero + "]" + _seller.getName() + ":" + url + "\n");
+								String page = new Get(url).getPage();
+								new ProcessPage(_seller).visit(page);
 
-									List<String> index = Find.findLines(page, "<b class=\"nropag_curr\">", "</b>");
-									if (index.size() == 1) {
-										int _page = (Integer.parseInt(index.get(0)) * 25) + 1;
-										url = "http://www.mercadolivre.com.br/jm/profile?act=ver&id=" + _seller.getName() + "&baseLista=" + _page + "&tipo=0&oper=B&orden=1#head_califs";
-										if (save){
-											System.out.println("save");
-											_seller.save();
-										}
-									} else {
-										done = true;
+								List<String> index = Find.findLines(page, "<b class=\"nropag_curr\">", "</b>");
+								if (index.size() == 1) {
+									int _page = (Integer.parseInt(index.get(0)) * 25) + 1;
+									url = "http://www.mercadolivre.com.br/jm/profile?act=ver&id=" + _seller.getName() + "&baseLista=" + _page + "&tipo=0&oper=B&orden=1#head_califs";
+								} else {
+									done = true;
+								}
+								if (save) {
+									if ((_seller.getFeedbacks().size() / 25) % 50 == 0) {
+										System.out.println("...SAVE...");
+										_seller.save();
 									}
 								}
-								_seller.save();
 							}
+							_seller.save();
 						}
 					} catch (java.lang.NumberFormatException e) {
 						e.printStackTrace();
@@ -179,7 +188,7 @@ class ProcessPage {
 
 		for (String feedback : lines) {
 			String classe = find(feedback, 1, 1, 5000, "rp2\\/(.+?)_fb.gif");
-			String description = find(feedback, 1, 1, 5000, "<div id=\"box_texto\">(.+?)<\\/div>");
+			String description = find(feedback, 1, 1, 5000, "<div id=\"box_texto\">(.+?)<\\/div>").replaceAll("&amp;", "");
 			String from = find(feedback, 1, 1, 5000, "profile\\?id=(.+?)\\&");
 
 			String fromIteration = find(feedback, 1, 1, 5000, "\\.\\.\\.\\((.+?)\\)<");

@@ -71,23 +71,6 @@ public class MLSeller {
 		Data.sellerToFile(this, getFile());
 	}
 
-	public boolean complete() {
-		File file = getFile();
-		if (!file.exists()) {
-			return false;
-		} else {
-			load(file);
-			if (this.getIterations() == this.getFeedbacks().size()) {
-				return true;
-			}
-			return false;
-		}
-	}
-
-	private void load(File file) {
-		Data.fileToMLSeller(this, file);
-	}
-
 	public File getFile() {
 		int folderId = this.id / 1000;
 		String folder = LemasConfig.path + File.separatorChar + folderId;
@@ -121,6 +104,10 @@ public class MLSeller {
 
 	public void setDate(String date) {
 		this.date = date;
+	}
+
+	public void load() {
+		Data.fileToMLSeller(this, getFile());
 	}
 
 }
