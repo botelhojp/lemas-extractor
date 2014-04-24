@@ -1,6 +1,10 @@
 package ml.crawler.ml;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,11 +16,14 @@ import lemas.commons.Find;
 import lemas.commons.Get;
 import lemas.commons.LemasConfig;
 
+import org.apache.xml.utils.XMLChar;
+
 public class MLFeedback {
 
 	public static String folder = System.getProperty("user.home");
 	public static int count1 = 0;
 	public static int count2 = 0;
+	public static int count3 = 0;
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("java -jar lemas-extractor-1.0.o-jar-with-dependencies.jar 1 999 15 2000");
@@ -25,6 +32,7 @@ public class MLFeedback {
 			verify(LemasConfig.path + File.separatorChar);
 			System.out.println("analisados: " + count1);
 			System.out.println("deletados: " + count2);
+			System.out.println("erro: " + count3);
 		} else {
 			int iniciar = Integer.parseInt(args[0]);
 			int terminar = Integer.parseInt(args[1]);
@@ -50,29 +58,66 @@ public class MLFeedback {
 		if (list == null)
 			return;
 		for (File f : list) {
+			System.gc();
 			if (f.isDirectory()) {
 				verify(f.getAbsolutePath());
 			} else {
 				count1++;
 				System.out.print("verify:" + f.getAbsoluteFile());
-				if (!findSeller(f)) {
-					System.out.println("   DELETED");
-					f.delete();
-					count2++;
-				} else {
-					System.out.println("   OK");
+				MLSeller seller = null;
+				try {
+					seller = findSeller(f);
+					if (seller == null) {
+						System.out.println("   DELETED");
+						f.delete();
+						count2++;
+					} else {
+						seller.load();
+						System.out.println("   OK");
+					}
+				} catch (RuntimeException e) {
+					count3++;
+					System.out.print("...PROBLEMA COM " + seller.getName());
+					corrige(seller);										
 				}
+
 			}
 		}
 	}
 
-	private static boolean findSeller(File f) {
+	private static void corrige(MLSeller seller) {
+		try {
+			StringBuilder sb = new StringBuilder();
+			FileInputStream fis = new FileInputStream(seller.getFile());
+			int content;
+			while ((content = fis.read()) != -1) {				
+				char c = (char) content;
+				if (XMLChar.isValid(c)) {
+		            sb.append(c);
+		        }				
+			}
+			fis.close();
+			PrintWriter writer = new PrintWriter(seller.getFile(), "UTF-8");
+			writer.print(sb.toString());
+			writer.close();
+			
+			seller.load();
+			System.out.println("...RESOLVIDO");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	private static MLSeller findSeller(File f) {
 		for (MLSeller seller : Data.getSellers()) {
 			if (seller.getFile().getAbsolutePath().equals(f.getAbsolutePath())) {
-				return true;
+				return seller;
 			}
 		}
-		return false;
+		return null;
 	}
 }
 

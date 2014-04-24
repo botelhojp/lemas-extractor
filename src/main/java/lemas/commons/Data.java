@@ -308,7 +308,7 @@ public class Data {
 						try {
 							f.setDescription(streamReader.getElementText());
 						} catch (javax.xml.stream.XMLStreamException e) {
-							e.printStackTrace();
+							throw new RuntimeException("erro ao ler xml", e);
 						}
 					}
 					if (streamReader.getLocalName().equals(from)) {
@@ -334,6 +334,8 @@ public class Data {
 			}
 			streamReader.close();
 			return seller;
+		} catch (RuntimeException e) {
+			throw e;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
