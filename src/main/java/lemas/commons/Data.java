@@ -27,6 +27,7 @@ import lemas.beans.MLSeller;
 import lemas.beans.Seller;
 import ml.crawler.ml.MLFeedback;
 
+import org.apache.xml.utils.XMLChar;
 import org.xml.sax.InputSource;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -392,5 +393,16 @@ public class Data {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public static String stripInvalidXmlCharacters(String input) {
+	    StringBuilder sb = new StringBuilder();
+	    for (int i = 0; i < input.length(); i++) {
+	        char c = input.charAt(i);
+	        if (XMLChar.isValid(c)) {
+	            sb.append(c);
+	        }
+	    }
+	    return sb.toString();
 	}
 }
