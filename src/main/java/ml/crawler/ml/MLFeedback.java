@@ -188,7 +188,7 @@ class ProcessPage {
 
 		for (String feedback : lines) {
 			String classe = find(feedback, 1, 1, 5000, "rp2\\/(.+?)_fb.gif");
-			String description = find(feedback, 1, 1, 5000, "<div id=\"box_texto\">(.+?)<\\/div>").replaceAll("&amp;", "");
+			String description = find(feedback, 1, 1, 5000, "<div id=\"box_texto\">(.+?)<\\/div>");
 			String from = find(feedback, 1, 1, 5000, "profile\\?id=(.+?)\\&");
 
 			String fromIteration = find(feedback, 1, 1, 5000, "\\.\\.\\.\\((.+?)\\)<");
