@@ -2,8 +2,6 @@ package ml.crawler.ml;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -58,7 +56,6 @@ public class MLFeedback {
 		if (list == null)
 			return;
 		for (File f : list) {
-			System.gc();
 			if (f.isDirectory()) {
 				verify(f.getAbsolutePath());
 			} else {
@@ -80,6 +77,7 @@ public class MLFeedback {
 					System.out.print("...PROBLEMA COM " + seller.getName());
 					corrige(seller);										
 				}
+				seller.clear();
 
 			}
 		}
@@ -103,12 +101,10 @@ public class MLFeedback {
 			
 			seller.load();
 			System.out.println("...RESOLVIDO");
-		} catch (FileNotFoundException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+			System.exit(-1);
+		} 		
 	}
 
 	private static MLSeller findSeller(File f) {

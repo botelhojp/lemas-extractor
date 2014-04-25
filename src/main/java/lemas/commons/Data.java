@@ -334,12 +334,11 @@ public class Data {
 			}
 			streamReader.close();
 			return seller;
-		} catch (RuntimeException e) {
-			throw e;
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
-			return null;
+			System.exit(-1);
 		}
+		return null;
 	}
 
 	public static void main(String args[]) {

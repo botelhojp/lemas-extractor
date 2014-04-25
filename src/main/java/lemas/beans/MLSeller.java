@@ -110,4 +110,8 @@ public class MLSeller {
 		Data.fileToMLSeller(this, getFile());
 	}
 
+	public void clear() {
+		this.feedbacks.clear();		
+	}
+
 }
