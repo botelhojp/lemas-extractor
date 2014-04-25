@@ -27,7 +27,8 @@ public class MLFeedback {
 		System.out.println("java -jar lemas-extractor-1.0.o-jar-with-dependencies.jar 1 999 15 2000");
 
 		if (args[0].equals("verify")) {
-			verify(LemasConfig.path + File.separatorChar);
+			int start = Integer.parseInt(args[1]);
+			verify(LemasConfig.path + File.separatorChar, start);
 			System.out.println("analisados: " + count1);
 			System.out.println("deletados: " + count2);
 			System.out.println("erro: " + count3);
@@ -50,32 +51,36 @@ public class MLFeedback {
 		}
 	}
 
-	private static void verify(String path) {
+	private static void verify(String path, int start) {
 		File root = new File(path);
 		File[] list = root.listFiles();
 		if (list == null)
 			return;
 		for (File f : list) {
 			if (f.isDirectory()) {
-				verify(f.getAbsolutePath());
+				verify(f.getAbsolutePath(), start);
 			} else {
 				count1++;
 				System.out.print("verify:" + f.getAbsoluteFile());
 				MLSeller seller = null;
 				try {
 					seller = findSeller(f);
-					if (seller == null) {
-						System.out.println("   DELETED");
-						f.delete();
-						count2++;
-					} else {
-						seller.load();
-						System.out.println("   OK");
+					if (seller.getId() >= start) {
+						if (seller == null) {
+							System.out.println("   DELETED");
+							f.delete();
+							count2++;
+						} else {
+							seller.load();
+							System.out.println("   OK");
+						}
+					}else{
+						System.out.println("   PULOU");
 					}
 				} catch (RuntimeException e) {
 					count3++;
 					System.out.print("...PROBLEMA COM " + seller.getName());
-					corrige(seller);										
+					corrige(seller);
 				}
 				seller.clear();
 
@@ -88,32 +93,30 @@ public class MLFeedback {
 			StringBuilder sb = new StringBuilder();
 			FileInputStream fis = new FileInputStream(seller.getFile());
 			int content;
-			while ((content = fis.read()) != -1) {				
+			while ((content = fis.read()) != -1) {
 				char c = (char) content;
 				if (XMLChar.isValid(c)) {
-		            sb.append(c);
-		        }				
+					sb.append(c);
+				}
 			}
 			fis.close();
 			PrintWriter writer = new PrintWriter(seller.getFile(), "UTF-8");
 			writer.print(sb.toString());
 			writer.close();
-			
+
 			seller.load();
 			System.out.println("...RESOLVIDO");
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
-		} 		
+		}
 	}
 
 	private static MLSeller findSeller(File f) {
-		for (MLSeller seller : Data.getSellers()) {
-			if (seller.getFile().getAbsolutePath().equals(f.getAbsolutePath())) {
-				return seller;
-			}
-		}
-		return null;
+		if (Data.find.isEmpty()){
+			Data.getSellers();
+		}			
+		return Data.find.get(f.getAbsolutePath());
 	}
 }
 

@@ -12,6 +12,7 @@ import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.xml.stream.XMLInputFactory;
@@ -52,6 +53,7 @@ public class Data {
 	private static final String price = "price";
 	private static final String date = "date";
 	private static List<MLSeller> sellers = null;
+	public static Hashtable<String, MLSeller> find = new Hashtable<String, MLSeller>();
 
 	public static String loadFileToStr(File file) {
 		StringBuilder sb = new StringBuilder();
@@ -335,10 +337,8 @@ public class Data {
 			streamReader.close();
 			return seller;
 		} catch (Throwable e) {
-			e.printStackTrace();
-			System.exit(-1);
+			throw new RuntimeException("", e);
 		}
-		return null;
 	}
 
 	public static void main(String args[]) {
@@ -385,7 +385,9 @@ public class Data {
 				String[] nextLine;
 				int numero = 0;
 				while ((nextLine = reader.readNext()) != null) {
-					sellers.add(new MLSeller(++numero, nextLine[0]));
+					MLSeller s = new MLSeller(++numero, nextLine[0]);
+					sellers.add(s);
+					find.put(s.getFile().getAbsolutePath(), s);
 				}
 				reader.close();
 			}
