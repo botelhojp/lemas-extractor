@@ -51,6 +51,7 @@ public class MLFeedback {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static void verify(String path, int start) {
 		File root = new File(path);
 		File[] list = root.listFiles();

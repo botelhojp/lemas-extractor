@@ -1,5 +1,11 @@
 package lemas.beans;
 
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Entity;
+
+@Entity
+@Table(name = "tb_feedback")
 public class Feedback {
 
 	private String type;

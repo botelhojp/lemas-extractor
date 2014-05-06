@@ -4,17 +4,30 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import lemas.commons.Data;
 import lemas.commons.LemasConfig;
 
+import org.hibernate.annotations.Entity;
+
+@Entity
+@Table(name = "tb_agent")
 public class MLSeller {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sq_pessoa")
+	@Column(name = "id_agent")
+	private int id;
 
 	private String name;
 	private String date;
 
 	private List<Feedback> feedbacks;
-
-	private int id;
 
 	private int iterations;
 
@@ -78,13 +91,12 @@ public class MLSeller {
 		if (!_folder.exists()) {
 			_folder.mkdirs();
 		}
-		return new File(folder + File.separatorChar + add("0", 5, getId()) + "_"
-				+ getName().replace("*", "_") + ".xml");
+		return new File(folder + File.separatorChar + add("0", 5, getId()) + "_" + getName().replace("*", "_") + ".xml");
 	}
 
 	private String add(String token, int count, int value) {
 		String sValue = value + "";
-		while(sValue.length() <= count){
+		while (sValue.length() <= count) {
 			sValue = "0" + sValue;
 		}
 		return sValue;
@@ -111,7 +123,7 @@ public class MLSeller {
 	}
 
 	public void clear() {
-		this.feedbacks.clear();		
+		this.feedbacks.clear();
 	}
 
 }
