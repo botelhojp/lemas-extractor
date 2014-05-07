@@ -16,19 +16,27 @@ public class HibernateUtil {
 	public static Session getCurrentSession() {
 		if (factory == null) {
 			Properties prop = new Properties();
-			prop.setProperty("hibernate.connection.url", "jdbc:hsqldb:file:" + MLFeedback.folder + File.separatorChar + ".dblemas" + File.separatorChar + "dblemas");
+			prop.setProperty("hibernate.connection.url", "jdbc:hsqldb:file:" + MLFeedback.folder + File.separatorChar + ".dblemas" + File.separatorChar + "dblemas;hsqldb.write_delay=false");
 			factory = new AnnotationConfiguration().addProperties(prop).configure().buildSessionFactory();
 			session = factory.openSession();
 		}
 		if (!session.isOpen()) {
 			session = factory.openSession();
 		}
+		
+		
 		return session;
 	}
 
 	public static void closeSession() {
 		if (session.isOpen()) {
 			session.close();
+		}
+	}
+	
+	public static void finish() {
+		if (!factory.isClosed()){
+			factory.close();
 		}
 	}
 }

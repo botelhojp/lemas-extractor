@@ -22,8 +22,7 @@ public class DB {
 				System.out.println(((MLSeller)o).getName());
 			}
 			HibernateUtil.closeSession();
-			
-			for (int i = 0; i < 2; i++) {
+			for (int i = 0; i < 2; i++) {				
 				session = HibernateUtil.getCurrentSession();
 				Transaction t = session.beginTransaction();
 				MLSeller seller01 = new MLSeller();
@@ -33,6 +32,7 @@ public class DB {
 				t.commit();
 				HibernateUtil.closeSession();
 			}
+			HibernateUtil.finish();
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
