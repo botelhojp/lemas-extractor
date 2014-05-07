@@ -1,36 +1,50 @@
 package lemas.beans;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import lemas.commons.Data;
 import lemas.commons.LemasConfig;
 
-import org.hibernate.annotations.Entity;
 
 @Entity
 @Table(name = "tb_agent")
-public class MLSeller {
+@SequenceGenerator(name = "sq_agent", sequenceName = "sq_agent")
+public class MLSeller implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sq_pessoa")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sq_agent")
 	@Column(name = "id_agent")
 	private int id;
 
 	private String name;
+	
+	@Transient
 	private String date;
 
+	@Transient
 	private List<Feedback> feedbacks;
 
+	@Transient
 	private int iterations;
 
+	@Transient
 	private String status;
 
 	public MLSeller(int id, String name, int iterations) {

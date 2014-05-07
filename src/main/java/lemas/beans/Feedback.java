@@ -1,13 +1,19 @@
 package lemas.beans;
 
+import java.io.Serializable;
+
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Entity;
 
 @Entity
 @Table(name = "tb_feedback")
-public class Feedback {
+public class Feedback implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String type;
 	private String description;
 	private String from;
