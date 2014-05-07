@@ -2,18 +2,27 @@ package lemas.beans;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Entity;
 
 @Entity
 @Table(name = "tb_feedback")
-public class Feedback implements Serializable{
+public class Feedback implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Long id;
 	private String type;
 	private String description;
 	private String from;
@@ -22,8 +31,11 @@ public class Feedback implements Serializable{
 	private String item;
 	private String price;
 	private String date;
+
 	
-	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "seller", nullable = false)
+	private MLSeller seller;
 
 	public Feedback(String type, String description, String from, String fromIterations, String reputation, String item, String price, String date) {
 		super();
@@ -103,6 +115,22 @@ public class Feedback implements Serializable{
 
 	public void setDate(String date) {
 		this.date = date;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public MLSeller getSeller() {
+		return seller;
+	}
+
+	public void setSeller(MLSeller seller) {
+		this.seller = seller;
 	}
 
 }

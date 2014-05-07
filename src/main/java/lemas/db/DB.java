@@ -3,6 +3,7 @@ package lemas.db;
 
 import java.util.List;
 
+import lemas.beans.Feedback;
 import lemas.beans.MLSeller;
 
 import org.hibernate.Criteria;
@@ -16,6 +17,7 @@ public class DB {
 		try {
 			Session session = HibernateUtil.getCurrentSession();
 			Criteria q = session.createCriteria(MLSeller.class);
+			@SuppressWarnings("rawtypes")
 			List l = q.list();
 			for(Object o : l){
 				System.out.println(((MLSeller)o).getId());
@@ -26,8 +28,15 @@ public class DB {
 				session = HibernateUtil.getCurrentSession();
 				Transaction t = session.beginTransaction();
 				MLSeller seller01 = new MLSeller();
-				seller01.setName("agente001");
+				seller01.setName("agente001");				
 				session.saveOrUpdate(seller01);
+				
+				session.flush();
+				
+				Feedback f = new Feedback("d", "", "", "", "", "", "", "");				
+				f.setSeller(seller01);
+				session.saveOrUpdate(f);
+				
 				session.flush();
 				t.commit();
 				HibernateUtil.closeSession();

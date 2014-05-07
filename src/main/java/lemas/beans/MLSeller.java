@@ -5,14 +5,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import lemas.commons.Data;
 import lemas.commons.LemasConfig;
@@ -20,7 +21,6 @@ import lemas.commons.LemasConfig;
 
 @Entity
 @Table(name = "tb_agent")
-@SequenceGenerator(name = "sq_agent", sequenceName = "sq_agent")
 public class MLSeller implements Serializable {
 
 	/**
@@ -29,29 +29,27 @@ public class MLSeller implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sq_agent")
-	@Column(name = "id_agent")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private int id;
 
 	private String name;
 	
-	@Transient
 	private String date;
 
-	@Transient
+	@OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private List<Feedback> feedbacks;
 
-	@Transient
 	private int iterations;
 
-	@Transient
 	private String status;
 
 	public MLSeller(int id, String name, int iterations) {
 		this();
 		this.id = id;
 		this.name = name;
-		this.iterations = iterations;
+		this.iterations = iterations;		
 	}
 
 	public MLSeller() {
