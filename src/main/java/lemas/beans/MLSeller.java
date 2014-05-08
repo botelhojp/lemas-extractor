@@ -18,6 +18,8 @@ import javax.persistence.Table;
 import lemas.commons.Data;
 import lemas.commons.LemasConfig;
 
+import org.hibernate.annotations.Cascade;
+
 
 @Entity
 @Table(name = "tb_agent")
@@ -33,16 +35,19 @@ public class MLSeller implements Serializable {
 	@Column(name = "id")
 	private int id;
 
+	@Column(name = "name", length=25)
 	private String name;
 	
+	@Column(name = "date", length=10)
 	private String date;
 
 	@OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private List<Feedback> feedbacks;
 
 	private int iterations;
 
+	@Column(name = "status", length=15)
 	private String status;
 
 	public MLSeller(int id, String name, int iterations) {

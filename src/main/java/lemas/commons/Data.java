@@ -331,6 +331,7 @@ public class Data {
 					if (streamReader.getLocalName().equals(date) && f != null) {
 						f.setDate(streamReader.getElementText());
 						seller.getFeedbacks().add(f);
+						f.setSeller(seller);
 					}
 				}
 			}

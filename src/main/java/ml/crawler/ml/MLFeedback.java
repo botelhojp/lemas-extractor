@@ -13,6 +13,7 @@ import lemas.commons.Data;
 import lemas.commons.Find;
 import lemas.commons.Get;
 import lemas.commons.LemasConfig;
+import lemas.db.SellerDAO;
 
 import org.apache.xml.utils.XMLChar;
 
@@ -23,8 +24,19 @@ public class MLFeedback {
 	public static int count2 = 0;
 	public static int count3 = 0;
 
+	private static SellerDAO dao = new SellerDAO();
+
 	public static void main(String[] args) throws Exception {
+
 		System.out.println("java -jar lemas-extractor-1.0.o-jar-with-dependencies.jar 1 999 15 2000");
+
+		if (args[0].equals("import")) {
+			int start = Integer.parseInt(args[1]);
+			save(LemasConfig.path + File.separatorChar, start);
+			System.out.println("analisados: " + count1);
+			System.out.println("deletados: " + count2);
+			System.out.println("erro: " + count3);
+		}
 
 		if (args[0].equals("verify")) {
 			int start = Integer.parseInt(args[1]);
@@ -73,9 +85,55 @@ public class MLFeedback {
 							count2++;
 						} else {
 							seller.load();
+
+							if (!dao.contains(seller)) {
+								dao.insert(seller);
+								System.out.println("   INSERIDO");
+							}else{
+								System.out.println("   JA EXISTE");
+							}
+
 							System.out.println("   OK");
 						}
-					}else{
+					} else {
+						System.out.println("   PULOU");
+					}
+				} catch (RuntimeException e) {
+					count3++;
+					System.out.print("...PROBLEMA COM " + seller.getName());
+//					corrige(seller);
+				}
+				seller.clear();
+
+			}
+		}
+	}
+
+	@SuppressWarnings("unused")
+	private static void save(String path, int start) {
+		File root = new File(path);
+		File[] list = root.listFiles();
+		if (list == null)
+			return;
+		for (File f : list) {
+			if (f.isDirectory()) {
+				verify(f.getAbsolutePath(), start);
+			} else {
+				count1++;
+				System.out.print("verify:" + f.getAbsoluteFile());
+				MLSeller seller = null;
+				try {
+					seller = findSeller(f);
+					if (seller.getId() >= start) {
+						if (seller == null) {
+							System.out.println("   DELETED");
+							f.delete();
+							count2++;
+						} else {
+							seller.load();
+							System.out.println("   OK");
+						}
+					} else {
 						System.out.println("   PULOU");
 					}
 				} catch (RuntimeException e) {
@@ -114,9 +172,9 @@ public class MLFeedback {
 	}
 
 	private static MLSeller findSeller(File f) {
-		if (Data.find.isEmpty()){
+		if (Data.find.isEmpty()) {
 			Data.getSellers();
-		}			
+		}
 		return Data.find.get(f.getAbsolutePath());
 	}
 }
