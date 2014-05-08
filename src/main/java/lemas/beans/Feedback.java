@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 
 @Entity
@@ -22,9 +23,10 @@ public class Feedback implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
-	private Long id;
+	private int id;
 	private String type;
 	private String description;
+	@Column(name = "from_")
 	private String from;
 	private String fromIterations;
 	private String reputation;
@@ -34,7 +36,7 @@ public class Feedback implements Serializable {
 
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "seller", nullable = false)
+	@JoinColumn(name = "seller", nullable = true)
 	private MLSeller seller;
 
 	public Feedback(String type, String description, String from, String fromIterations, String reputation, String item, String price, String date) {
@@ -117,11 +119,11 @@ public class Feedback implements Serializable {
 		this.date = date;
 	}
 
-	public Long getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 

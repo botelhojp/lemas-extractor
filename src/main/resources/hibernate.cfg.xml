@@ -13,9 +13,9 @@
 		<property name="current_session_context_class">thread</property>
 		
 		<property name="hbm2ddl.auto">update</property>
-
+		<mapping class="lemas.beans.Feedback" />
 		<mapping class="lemas.beans.MLSeller" />
-        <mapping class="lemas.beans.Feedback" />
+        
 
 	</session-factory>
 </hibernate-configuration>
