@@ -1,6 +1,7 @@
 package lemas.beans;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,8 +12,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
+import lemas.commons.Data;
+
+import org.hibernate.annotations.Type;
+import org.hibernate.validator.NotNull;
 
 @Entity
 @Table(name = "tb_feedback")
@@ -24,58 +28,67 @@ public class Feedback implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private int id;
-	
-	@Column(name = "type", length=3)
-	private String type;
-	
-	@Column(name = "description", length=256)
-	private String description;
-	
-	@Column(name = "from_", length=25)
-	private String from;
-	
-	@Column(name = "fromIterations", length=15)
-	private String fromIterations;
-	
-	@Column(name = "reputation", length=10)
-	private String reputation;
-	
-	@Column(name = "item", length=256)
-	private String item;
-	
-	@Column(name = "price", length=256)
-	private String price;
-	
-	@Column(name = "date", length=10)
-	private String date;
 
-	
+	@Column(name = "feedback", length = 1)
+	@NotNull
+	private String feedback;
+
+	@Column(name = "type", length = 1)
+	@NotNull
+	private String type;
+
+	@Column(name = "description", length = 256)
+	private String description;
+
+	@Column(name = "from_", length = 25)
+	private String from;
+
+	@Column(name = "fromIterations")
+	private Integer fromIterations;
+
+	@Column(name = "item", length = 256)
+	private String item;
+
+	@Column(name = "price")
+	private Double price;
+
+	@Column(name = "date", length = 10)
+	@Type(type = "date")
+	private Date date;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "seller", nullable = false)
 	private MLSeller seller;
 
-	public Feedback(String type, String description, String from, String fromIterations, String reputation, String item, String price, String date) {
+	public Feedback(String feedback, String type, String description, String from, String fromIterations, String reputation, String item, String price, String date) {
 		super();
-		this.type = type.trim();
-		this.description = description.trim();
+		setFeedback(feedback.trim());
+		setType("S");
+		setDescription(description.trim().replaceAll("\"", ""));
 		this.from = from.trim();
-		this.fromIterations = fromIterations.trim();
-		this.reputation = reputation.trim();
+		this.fromIterations = Integer.parseInt(fromIterations.trim());
+		// this.reputation = reputation.trim();
 		this.item = item.trim();
-		this.price = price.trim();
-		this.date = date.trim();
+		
+		try{
+			this.price = Data.strToDouble(price.trim());
+		}catch(NumberFormatException e){
+			this.price = 0.0;
+		}
+		
+		this.date = Data.strToDate(date);
 	}
 
 	public Feedback() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public String getType() {
-		return type;
+	public String getFeedback() {
+		return feedback;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setFeedback(String feedback) {
+		this.feedback = feedback.substring(0, 1).toUpperCase();
 	}
 
 	public String getDescription() {
@@ -83,7 +96,12 @@ public class Feedback implements Serializable {
 	}
 
 	public void setDescription(String description) {
-		this.description = description;
+		int tam = (description.length() > 256) ? 256 : description.length();
+		if (tam > 2) {
+			this.description = description.substring(1, tam - 1);
+		} else {
+			this.description = description;
+		}
 	}
 
 	public String getFrom() {
@@ -94,21 +112,21 @@ public class Feedback implements Serializable {
 		this.from = from;
 	}
 
-	public String getFromIterations() {
+	public Integer getFromIterations() {
 		return fromIterations;
 	}
 
-	public void setFromIterations(String fromIterations) {
+	public void setFromIterations(Integer fromIterations) {
 		this.fromIterations = fromIterations;
 	}
 
-	public String getReputation() {
-		return reputation;
-	}
-
-	public void setReputation(String reputation) {
-		this.reputation = reputation;
-	}
+	// public String getReputation() {
+	// return reputation;
+	// }
+	//
+	// public void setReputation(String reputation) {
+	// this.reputation = reputation;
+	// }
 
 	public String getItem() {
 		return item;
@@ -116,22 +134,6 @@ public class Feedback implements Serializable {
 
 	public void setItem(String item) {
 		this.item = item;
-	}
-
-	public String getPrice() {
-		return price;
-	}
-
-	public void setPrice(String price) {
-		this.price = price;
-	}
-
-	public String getDate() {
-		return date;
-	}
-
-	public void setDate(String date) {
-		this.date = date;
 	}
 
 	public int getId() {
@@ -148,6 +150,30 @@ public class Feedback implements Serializable {
 
 	public void setSeller(MLSeller seller) {
 		this.seller = seller;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public Double getPrice() {
+		return price;
+	}
+
+	public void setPrice(Double price) {
+		this.price = price;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 }

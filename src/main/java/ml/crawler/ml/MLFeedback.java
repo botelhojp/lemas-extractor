@@ -32,7 +32,7 @@ public class MLFeedback {
 
 		if (args[0].equals("import")) {
 			int start = Integer.parseInt(args[1]);
-			save(LemasConfig.path + File.separatorChar, start);
+			verify(LemasConfig.path + File.separatorChar, start);
 			System.out.println("analisados: " + count1);
 			System.out.println("deletados: " + count2);
 			System.out.println("erro: " + count3);
@@ -75,21 +75,20 @@ public class MLFeedback {
 			} else {
 				count1++;
 				System.out.print("verify:" + f.getAbsoluteFile());
-				MLSeller seller = null;
+				MLSeller seller = new MLSeller();
 				try {
-					seller = findSeller(f);
-					if (seller.getId() >= start) {
+					seller.load(f);
+					if (seller != null && seller.getId() >= start) {
 						if (seller == null) {
 							System.out.println("   DELETED");
 							f.delete();
 							count2++;
 						} else {
-							seller.load();
-
 							if (!dao.contains(seller)) {
+								//seller.load();
 								dao.insert(seller);
 								System.out.println("   INSERIDO");
-							}else{
+							} else {
 								System.out.println("   JA EXISTE");
 							}
 
@@ -100,10 +99,14 @@ public class MLFeedback {
 					}
 				} catch (RuntimeException e) {
 					count3++;
+					e.printStackTrace();
 					System.out.print("...PROBLEMA COM " + seller.getName());
-//					corrige(seller);
+					// corrige(seller);
+					e.printStackTrace();
 				}
-				seller.clear();
+				if (seller != null) {
+					seller.clear();
+				}
 
 			}
 		}
@@ -175,7 +178,13 @@ public class MLFeedback {
 		if (Data.find.isEmpty()) {
 			Data.getSellers();
 		}
-		return Data.find.get(f.getAbsolutePath());
+		
+		
+		MLSeller r = Data.find.get(f.getAbsolutePath());
+		if (r == null){
+			System.out.println(f.getAbsolutePath());
+		}
+		return r;
 	}
 }
 
@@ -285,7 +294,7 @@ class ProcessPage {
 		String date = find(contentDate, 1, 1, 20, "Membro desde:(.+?)<br>");
 
 		seller.setIterations(Integer.parseInt(iterations));
-		seller.setDate(date);
+		seller.setDate(Data.strToDate(date));
 
 		List<String> lines = Find.findLines(contentDate, "<div id=\"content_box\">", "<div id=\"abajo\" class=\"linea_row\"></div>");
 
@@ -300,7 +309,7 @@ class ProcessPage {
 			String item = find(feedback, 2, 1, 5000, "comprou(.+?)>(.+?)\\.\\.\\.");
 			String value = find(feedback, 1, 1, 5000, "R\\$(.+?)<");
 			String time = find(feedback, 1, 1, 5000, "fecha\">(.+?) -");
-			seller.getFeedbacks().add(new Feedback(classe, description, from, fromIteration, Star, item, value, time));
+			seller.getFeedbacks().add(new Feedback(classe, "S", description, from, fromIteration, Star, item, value, time));
 
 		}
 		seller.setStatus(seller.getFeedbacks().size() + "/" + seller.getIterations());

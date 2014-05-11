@@ -10,7 +10,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
@@ -37,6 +40,8 @@ import com.sun.xml.txw2.output.IndentingXMLStreamWriter;
 
 public class Data {
 
+	private static SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy");
+
 	private static final String tag_seller = "seller";
 	private static final String name = "name";
 	private static final String id = "id";
@@ -49,7 +54,7 @@ public class Data {
 	private static final String feedback = "feedback";
 	private static final String from_iterations = "from-iterations";
 	private static final String tagItem = "item";
-	private static final String reputation = "reputation";
+	// private static final String reputation = "reputation";
 	private static final String price = "price";
 	private static final String date = "date";
 	private static List<MLSeller> sellers = null;
@@ -92,7 +97,7 @@ public class Data {
 
 					out.writeStartElement("date");
 					{
-						out.writeCharacters(seller.getDate().trim() + "");
+						out.writeCharacters(Data.dateToStr(seller.getDate()));
 					}
 					out.writeEndElement();
 
@@ -115,7 +120,7 @@ public class Data {
 							{
 								out.writeStartElement(type);
 								{
-									out.writeCharacters(item.getType());
+									out.writeCharacters(item.getFeedback());
 								}
 								out.writeEndElement();
 
@@ -133,7 +138,7 @@ public class Data {
 
 								out.writeStartElement(from_iterations);
 								{
-									out.writeCharacters(item.getFromIterations());
+									out.writeCharacters(item.getFromIterations().toString());
 								}
 								out.writeEndElement();
 
@@ -151,13 +156,13 @@ public class Data {
 
 								out.writeStartElement(price);
 								{
-									out.writeCharacters(item.getPrice());
+									out.writeCharacters(item.getPrice().toString());
 								}
 								out.writeEndElement();
 
 								out.writeStartElement(date);
 								{
-									out.writeCharacters(item.getDate());
+									out.writeCharacters(Data.dateToStr(item.getDate()));
 								}
 								out.writeEndElement();
 							}
@@ -215,7 +220,7 @@ public class Data {
 							{
 								out.writeStartElement(type);
 								{
-									out.writeCharacters(item.getType());
+									out.writeCharacters(item.getFeedback());
 								}
 								out.writeEndElement();
 
@@ -233,15 +238,15 @@ public class Data {
 
 								out.writeStartElement(from_iterations);
 								{
-									out.writeCharacters(item.getFromIterations());
+									out.writeCharacters(item.getFromIterations().toString());
 								}
 								out.writeEndElement();
 
-								out.writeStartElement(reputation);
-								{
-									out.writeCharacters(item.getReputation());
-								}
-								out.writeEndElement();
+								// out.writeStartElement(reputation);
+								// {
+								// out.writeCharacters(item.getReputation());
+								// }
+								// out.writeEndElement();
 
 								out.writeStartElement(tagItem);
 								{
@@ -251,13 +256,13 @@ public class Data {
 
 								out.writeStartElement(price);
 								{
-									out.writeCharacters(item.getPrice());
+									out.writeCharacters(item.getPrice().toString());
 								}
 								out.writeEndElement();
 
 								out.writeStartElement(date);
 								{
-									out.writeCharacters(item.getDate());
+									out.writeCharacters(Data.dateToStr(item.getDate()));
 								}
 								out.writeEndElement();
 							}
@@ -278,13 +283,13 @@ public class Data {
 
 	public static MLSeller fileToMLSeller(MLSeller seller, File file) {
 		try {
-			
+
 			XMLInputFactory factory = XMLInputFactory.newInstance();
 			XMLStreamReader streamReader = factory.createXMLStreamReader(new FileReader(file));
-			Feedback f = null ;
+			Feedback f = null;
 			while (streamReader.hasNext()) {
-				streamReader.next();				
-				if (streamReader.getEventType() == XMLStreamReader.START_ELEMENT) {						
+				streamReader.next();
+				if (streamReader.getEventType() == XMLStreamReader.START_ELEMENT) {
 					if (streamReader.getLocalName().equals(name)) {
 						seller.setName(streamReader.getElementText());
 					}
@@ -292,7 +297,7 @@ public class Data {
 						seller.setId(Integer.parseInt(streamReader.getElementText()));
 					}
 					if (streamReader.getLocalName().equals("date") && f == null) {
-						seller.setDate(streamReader.getElementText());
+						seller.setDate(Data.strToDate(streamReader.getElementText()));
 					}
 					if (streamReader.getLocalName().equals(iterations)) {
 						seller.setIterations(Integer.parseInt(streamReader.getElementText()));
@@ -302,9 +307,10 @@ public class Data {
 					}
 					if (streamReader.getLocalName().equals(feedback)) {
 						f = new Feedback();
+						f.setType("S");
 					}
 					if (streamReader.getLocalName().equals(type)) {
-						f.setType(streamReader.getElementText());
+						f.setFeedback(streamReader.getElementText());
 					}
 					if (streamReader.getLocalName().equals(description)) {
 						try {
@@ -317,19 +323,23 @@ public class Data {
 						f.setFrom(streamReader.getElementText());
 					}
 					if (streamReader.getLocalName().equals(from_iterations)) {
-						f.setFromIterations(streamReader.getElementText());
+						try {
+							f.setFromIterations(Integer.parseInt(streamReader.getElementText()));
+						} catch (NumberFormatException e) {
+							f.setFromIterations(0);
+						}
 					}
-					if (streamReader.getLocalName().equals(reputation)) {
-						f.setReputation(streamReader.getElementText());
-					}
+					// if (streamReader.getLocalName().equals(reputation)) {
+					// f.setReputation(streamReader.getElementText());
+					// }
 					if (streamReader.getLocalName().equals(tagItem)) {
 						f.setItem(streamReader.getElementText());
 					}
 					if (streamReader.getLocalName().equals(price)) {
-						f.setPrice(streamReader.getElementText());
+						f.setPrice(Data.strToDouble(streamReader.getElementText()));
 					}
 					if (streamReader.getLocalName().equals(date) && f != null) {
-						f.setDate(streamReader.getElementText());
+						f.setDate(Data.strToDate(streamReader.getElementText()));
 						seller.getFeedbacks().add(f);
 						f.setSeller(seller);
 					}
@@ -398,15 +408,36 @@ public class Data {
 			return null;
 		}
 	}
-	
+
 	public static String stripInvalidXmlCharacters(String input) {
-	    StringBuilder sb = new StringBuilder();
-	    for (int i = 0; i < input.length(); i++) {
-	        char c = input.charAt(i);
-	        if (XMLChar.isValid(c)) {
-	            sb.append(c);
-	        }
-	    }
-	    return sb.toString();
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < input.length(); i++) {
+			char c = input.charAt(i);
+			if (XMLChar.isValid(c)) {
+				sb.append(c);
+			}
+		}
+		return sb.toString();
+	}
+
+	public static Date strToDate(String date) {
+		try {
+			return dt.parse(date);
+		} catch (ParseException e) {
+			return null;
+		}
+	}
+
+	public static String dateToStr(Date date) {
+		return dt.format(date);
+	}
+
+	public static Double strToDouble(String value) {
+		try {
+			return Double.parseDouble(value.replaceAll(",", "."));
+		} catch (NumberFormatException e) {
+			return 0.0;
+		}
+
 	}
 }

@@ -163,7 +163,7 @@ class ProcessPage {
 			String item = find(feedback, 1, 1, 5000, "<tr class=\"bot\"><td>&nbsp;<\\/td><td>(.+?)\\(#");
 			String value = find(feedback, 1, 1, 5000, "US \\$(.+?)<");
 			String time = find(feedback, 1, 1, 5000, "\\<td nowrap=\"nowrap\"\\>(.+?)<");
-			seller.getFeedbacks().add(new Feedback(classe, description, from, fromIteration, Star, item, value, time));
+			seller.getFeedbacks().add(new Feedback(classe, "S", description, from, fromIteration, Star, item, value, time));
 
 		}
 		seller.setStatus(seller.getFeedbacks().size() + "/" + seller.getIterations());

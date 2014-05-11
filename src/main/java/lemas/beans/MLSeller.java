@@ -3,6 +3,7 @@ package lemas.beans;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -14,20 +15,19 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import lemas.commons.Data;
 import lemas.commons.LemasConfig;
 
 import org.hibernate.annotations.Cascade;
-
+import org.hibernate.annotations.Type;
+import org.hibernate.validator.NotNull;
 
 @Entity
 @Table(name = "tb_agent")
 public class MLSeller implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -35,26 +35,29 @@ public class MLSeller implements Serializable {
 	@Column(name = "id")
 	private int id;
 
-	@Column(name = "name", length=25)
+	@Column(name = "name", length = 25, unique=true)
+	@NotNull
 	private String name;
-	
-	@Column(name = "date", length=10)
-	private String date;
+
+	@Column(name = "date")
+	@Type(type = "date")
+	private Date date;
 
 	@OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private List<Feedback> feedbacks;
 
+	@Column(name = "iterations")
 	private int iterations;
 
-	@Column(name = "status", length=15)
+	@Transient
 	private String status;
 
 	public MLSeller(int id, String name, int iterations) {
 		this();
 		this.id = id;
 		this.name = name;
-		this.iterations = iterations;		
+		this.iterations = iterations;
 	}
 
 	public MLSeller() {
@@ -127,11 +130,11 @@ public class MLSeller implements Serializable {
 		this.status = status;
 	}
 
-	public String getDate() {
+	public Date getDate() {
 		return date;
 	}
 
-	public void setDate(String date) {
+	public void setDate(Date date) {
 		this.date = date;
 	}
 
@@ -141,6 +144,10 @@ public class MLSeller implements Serializable {
 
 	public void clear() {
 		this.feedbacks.clear();
+	}
+
+	public void load(File f) {
+		Data.fileToMLSeller(this, f);
 	}
 
 }
