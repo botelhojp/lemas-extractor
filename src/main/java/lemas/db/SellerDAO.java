@@ -4,6 +4,7 @@ import java.util.List;
 
 import lemas.beans.Feedback;
 import lemas.beans.MLSeller;
+import lemas.commons.Data;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -33,14 +34,15 @@ public class SellerDAO {
 
 	
 	@SuppressWarnings("unchecked")
-	public List<Feedback> listFeedback(int page){
+	public List<Feedback> listFeedback(int page, String d1, String d2){
 		int tam = 100;
 		Session session = HibernateUtil.getCurrentSession();
 		Criteria q = session.createCriteria(Feedback.class);
+		q.add(Restrictions.between("date", Data.strToDate(d1), Data.strToDate(d2)));
 		q.addOrder(Order.asc("date"));
 		
 		q.setFirstResult((tam * (page - 1)) + 1);
-		q.setMaxResults(100);
+		q.setMaxResults(1000);
 		
 		List<Feedback> l = q.list();
 		for(Feedback i: l){

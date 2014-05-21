@@ -10,44 +10,55 @@ import java.util.List;
 
 import lemas.beans.Feedback;
 import lemas.beans.MLSeller;
+import lemas.commons.Data;
 import ml.crawler.ml.MLFeedback;
 
 public class DB {
-	
+
+	private static long lineCount = 1;
+
 	public static void main(String[] args) {
-		SellerDAO dao = new SellerDAO();
-		for (int i = 1; i <= 10; i++) {
-			page(dao, i);
-			write("\n\n==\n\n");
+		try {
+			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(MLFeedback.folder + File.separatorChar + "feedback.arff", true)));
+			SellerDAO dao = new SellerDAO();
+			boolean isDone = false;
+			int page = 0;
+			while (!isDone) {
+				isDone = !saveForPage(out, dao, ++page, "01/01/1999", "31/12/2005");
+				System.out.println("page [" + page + "] ok");
+			}
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
-	private static List<Feedback> page(SellerDAO dao, int page) {
-		List<Feedback> list = dao.listFeedback(page);
-		for(Feedback f : list){
-			write(f);			
+	private static boolean saveForPage(PrintWriter out, SellerDAO dao, int page, String d1, String d2) {
+		List<Feedback> list = dao.listFeedback(page, d1, d2);
+		for (Feedback f : list) {
+			write(out, f);
 		}
-		return list;
+		return !list.isEmpty();
 	}
 
-	private static void write(Feedback f) {
+	private static void write(PrintWriter out, Feedback f) {
 		StringBuffer linha = new StringBuffer();
-		linha.append(f.getFrom()).append(",");
-		linha.append(f.getSeller().getName()).append(",");
-		linha.append(f.getDate());
-		write(linha.toString());
+		linha.append(lineCount++).append(";");
+		linha.append(f.getFrom()).append(";");
+		linha.append(f.getSeller().getName()).append(";");
+		linha.append(Data.dateToStr(f.getDate())).append(";");
+		linha.append(f.getDescription().replaceAll(";", "").toLowerCase()).append(";");
+		linha.append(f.getItem().replaceAll(";", "").toLowerCase()).append(";");
+		linha.append(f.getPrice()).append(";");
+		linha.append(f.getFeedback());
+		write(out, linha.toString());
 	}
 
-	
-	private static void write(String content) {
-		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(MLFeedback.folder + File.separatorChar + "feedback.txt", true)))) {
-			System.out.println(content);
-		    out.println(content);
-		}catch (IOException e) {
-		    //exception handling left as an exercise for the reader
-		}
-		
+	private static void write(PrintWriter out, String content) {
+		System.out.println(content);
+		out.println(content);
 	}
+
 	public static void main2(String[] args) {
 		try {
 			SellerDAO dao = new SellerDAO();
@@ -65,7 +76,7 @@ public class DB {
 					Feedback f = new Feedback("d", "S", "a", "c", "e", "d", "e", "e", "w");
 					f.setSeller(seller01);
 					seller01.getFeedbacks().add(f);
-					System.out.println( i + " : " + k);
+					System.out.println(i + " : " + k);
 				}
 				dao.insert(seller01);
 			}

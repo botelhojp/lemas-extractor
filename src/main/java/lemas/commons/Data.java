@@ -40,8 +40,7 @@ import com.sun.xml.txw2.output.IndentingXMLStreamWriter;
 
 public class Data {
 
-	private static SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy");
-
+	private static SimpleDateFormat dt = new SimpleDateFormat("dd/MM/yyyy");
 	private static final String tag_seller = "seller";
 	private static final String name = "name";
 	private static final String id = "id";
