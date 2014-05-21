@@ -24,7 +24,7 @@ public class DB {
 			boolean isDone = false;
 			int page = 0;
 			while (!isDone) {
-				isDone = !saveForPage(out, dao, ++page, "01/01/2014", "31/12/20014");
+				isDone = !saveForPage(out, dao, ++page, "01/01/1999", "31/12/2005");
 				System.out.println("page [" + page + "] ok");
 			}
 			out.close();

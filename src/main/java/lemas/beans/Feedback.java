@@ -29,7 +29,7 @@ public class Feedback implements Serializable {
 	@Column(name = "id")
 	private int id;
 
-	@Column(name = "feedback", length = 1)
+	@Column(name = "feedback", length = 3)
 	@NotNull
 	private String feedback;
 
@@ -88,7 +88,7 @@ public class Feedback implements Serializable {
 	}
 
 	public void setFeedback(String feedback) {
-		this.feedback = feedback.substring(0, 1).toUpperCase();
+		this.feedback = feedback.toLowerCase();
 	}
 
 	public String getDescription() {
