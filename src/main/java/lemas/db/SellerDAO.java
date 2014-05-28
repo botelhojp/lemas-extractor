@@ -10,6 +10,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 public class SellerDAO {
@@ -36,11 +37,8 @@ public class SellerDAO {
 	@SuppressWarnings("unchecked")
 	public List<Feedback> listFeedback(int page, String d1, String d2){
 		int tam = 1000;
-		Session session = HibernateUtil.getCurrentSession();
-		Criteria q = session.createCriteria(Feedback.class);
-		q.add(Restrictions.between("date", Data.strToDate(d1), Data.strToDate(d2)));
+		Criteria q = getCriteria(d1, d2);
 		q.addOrder(Order.asc("date"));
-		
 		q.setFirstResult((tam * (page - 1)) + 1);
 		q.setMaxResults(tam);
 		
@@ -50,6 +48,17 @@ public class SellerDAO {
 		}
 		HibernateUtil.closeSession();
 		return l;
+	}
+	
+	public int countFeedback(String d1, String d2) {  
+        return ((Number) getCriteria(d1, d2).setProjection(Projections.rowCount()).uniqueResult()).intValue();  
+    }
+	
+	public Criteria getCriteria(String d1, String d2){
+		Session session = HibernateUtil.getCurrentSession();
+		Criteria q = session.createCriteria(Feedback.class);
+		q.add(Restrictions.between("date", Data.strToDate(d1), Data.strToDate(d2)));
+		return q;
 	}
 	
 	

@@ -19,12 +19,20 @@ public class DB {
 
 	public static void main(String[] args) {
 		try {
-			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(MLFeedback.folder + File.separatorChar + "feedback.arff", true)));
+			String[] periodo ={"01/01/1999", "31/12/2000"};
+					
+					
+			File file = new File(MLFeedback.folder + File.separatorChar + "feedback.arff");
+			file.delete();
+			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
 			SellerDAO dao = new SellerDAO();
 			boolean isDone = false;
 			int page = 0;
+			write(out, "----------------------------------");
+			write(out, "No. of patterns : " + dao.countFeedback(periodo[0], periodo[1]));
+			write(out, "----------------------------------");
 			while (!isDone) {
-				isDone = !saveForPage(out, dao, ++page, "01/01/1999", "31/12/2005");
+				isDone = !saveForPage(out, dao, ++page, periodo[0], periodo[1]);
 				System.out.println("page [" + page + "] ok");
 			}
 			out.close();
