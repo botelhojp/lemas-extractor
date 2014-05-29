@@ -51,7 +51,7 @@ public class SellerDAO {
 	}
 	
 	public int countFeedback(String d1, String d2) {  
-        return ((Number) getCriteria(d1, d2).setProjection(Projections.rowCount()).uniqueResult()).intValue();  
+        return ((Number) getCriteria(d1, d2).setProjection(Projections.rowCount()).uniqueResult()).intValue() - 1;  
     }
 	
 	public Criteria getCriteria(String d1, String d2){

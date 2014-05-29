@@ -19,7 +19,7 @@ public class DB {
 
 	public static void main(String[] args) {
 		try {
-			String[] periodo ={"01/01/1999", "31/12/2000"};
+			String[] periodo ={"01/01/2013", "31/12/2014"};
 					
 					
 			File file = new File(MLFeedback.folder + File.separatorChar + "feedback.arff");
