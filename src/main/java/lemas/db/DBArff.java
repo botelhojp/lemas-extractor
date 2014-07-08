@@ -13,28 +13,44 @@ import lemas.beans.MLSeller;
 import lemas.commons.Data;
 import ml.crawler.ml.MLFeedback;
 
-public class DB {
+public class DBArff {
 
-	private static long lineCount = 1;
+//	private static long lineCount = 1;
 
 	public static void main(String[] args) {
 		try {
-			String[] periodo ={"01/01/2014", "01/03/2014"};
-					
+			String[] periodo = { "01/01/2013", "10/01/2013" };
+
 			File file = new File(MLFeedback.folder + File.separatorChar + "feedback.arff");
 			file.delete();
 			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
 			SellerDAO dao = new SellerDAO();
 			boolean isDone = false;
 			int page = 0;
-			write(out, "----------------------------------");
-			write(out, "No. of patterns : " + dao.countFeedback(periodo[0], periodo[1]));
-			write(out, "----------------------------------");
+			write(out, "% Feedbacks");
+			write(out, "");
+			write(out, "@RELATION feedbacks");
+			write(out, "");
+//			write(out, "@ATTRIBUTE count INTEGER");
+			write(out, "@ATTRIBUTE client INTEGER");
+			write(out, "@ATTRIBUTE server INTEGER");
+			write(out, "@ATTRIBUTE date DATE \"dd/MM/yyyy\"");
+			write(out, "@ATTRIBUTE comments STRING");
+			write(out, "@ATTRIBUTE item STRING");
+			write(out, "@ATTRIBUTE price REAL");
+			write(out, "@ATTRIBUTE feedback { pos, neu, neg }");
+			write(out, "");
+			write(out, "@DATA");
+			write(out, "%");
+			write(out, "% Instances ("+ dao.countFeedback(periodo[0], periodo[1])  + "):");
+			write(out, "%");
+			write(out, "");			
 			while (!isDone) {
 				isDone = !saveForPage(out, dao, ++page, periodo[0], periodo[1]);
 				System.out.println("page [" + page + "] ok");
 			}
 			out.close();
+			System.out.println("== CONCLUIDO ==");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -49,16 +65,23 @@ public class DB {
 	}
 
 	private static void write(PrintWriter out, Feedback f) {
+		String separate = "\",\"";
 		StringBuffer linha = new StringBuffer();
-		linha.append(lineCount++).append(";");
-		linha.append(f.getFrom()).append(";");
-		linha.append(f.getSeller().getName()).append(";");
-		linha.append(Data.dateToStr(f.getDate())).append(";");
-		linha.append(f.getDescription().replaceAll(";", "").toLowerCase()).append(";");
-		linha.append(f.getItem().replaceAll(";", "").toLowerCase()).append(";");
-		linha.append(f.getPrice()).append(";");
-		linha.append(f.getFeedback());
+		linha.append("\"");
+//		linha.append(lineCount++).append(separate);
+		linha.append(tratarString(f.getFrom())).append(separate);
+		linha.append(tratarString(f.getSeller().getName())).append(separate);
+		linha.append(Data.dateToStr(f.getDate())).append(separate);
+		linha.append(tratarString(f.getDescription()).toLowerCase()).append(separate);
+		linha.append(tratarString(f.getItem()).toLowerCase()).append(separate);
+		linha.append(f.getPrice()).append(separate);
+		linha.append(f.getFeedback()).append("\"");
 		write(out, linha.toString());
+	}
+	
+
+	private static String tratarString(String value) {
+		return value.replaceAll("&oper=B", "").replaceAll("\"", "'").replace('\\', ',');
 	}
 
 	private static void write(PrintWriter out, String content) {
