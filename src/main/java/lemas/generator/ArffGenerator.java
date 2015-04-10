@@ -19,7 +19,7 @@ public class ArffGenerator {
 		
 		
 
-		File file = new File(System.getProperty("user.home") + File.separatorChar + "Downloads" + File.separatorChar + "file_" + "hotel.arff");
+		File file = new File(System.getProperty("user.home") + File.separatorChar + "Dropbox" + File.separatorChar + "file_" + "hotel.arff");
 		if (file.exists()) {
 			file.delete();
 		}
@@ -37,12 +37,12 @@ public class ArffGenerator {
 		writer.println("");
 		writer.println("@DATA");
 
-		int total = 400;
+		int total = 1000;
 
 		for (int i = 0; i < total; i++) {
 
-			String client = make_client("user_", total / 10);
-			String server = make_client("hotel_", total / 10);
+			String client = make_client("user_", total / 20);
+			String server = make_client("hotel_", total / 50);
 			String date = make_date(i);
 			String comments = "";
 			String context = "general";			
