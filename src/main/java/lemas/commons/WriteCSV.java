@@ -23,11 +23,11 @@ public class WriteCSV {
 
 	public synchronized static void add(String value) {
 		writer.println(value);
-		if (count++ % 50 == 0) {
+//		if (count++ % 50 == 0) {
 			System.out.println("write:" + file);
 			close();
 			open(file);
-		}
+//		}
 	}
 
 	public static void close() {
