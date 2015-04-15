@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.tika.utils.RegexUtils;
+
 public class Find {
 	
 	public static List<String> findLines(String contentDate, String start, String end) {
@@ -24,13 +26,24 @@ public class Find {
 		return lines;
 	}
 	
-	public static String findRegex(String contentDate, String pattern) {
-		Pattern MY_PATTERN = Pattern.compile(pattern);
+	public static String findRegex(String contentDate, String pattern) {		
+		Pattern MY_PATTERN = Pattern.compile(pattern, Pattern.MULTILINE);
 		Matcher m = MY_PATTERN.matcher(contentDate);
 		while (m.find()) {
 			return m.group(1);
 		}
 		return "";
 	}
+	
+	public static int countFindRegex(String contentDate, String pattern) {		
+		Pattern MY_PATTERN = Pattern.compile(pattern, Pattern.MULTILINE);
+		Matcher m = MY_PATTERN.matcher(contentDate);
+		while (m.find()) {
+			return m.groupCount();			
+		}
+		return 0;
+	}
+	
+	
 
 }
