@@ -6,8 +6,10 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
+import lemas.commons.DB;
 import lemas.commons.Find;
 import lemas.commons.WriteCSV;
 import au.com.bytecode.opencsv.CSVReader;
@@ -16,57 +18,53 @@ public class TripadvisorUserCrawler {
 
 	public static void main(String[] args) throws Exception {
 
-		WriteCSV.open("/tmp/detail_users.csv");
-		
-		URL url;
-		InputStream is = null;
-		BufferedReader br;
-		String line;
+		if (DB.connect()) {
 
-		String file = System.getProperty("user.home") + "/Dropbox/Doutorado/experimentos/tripadvisor/hoteis.csv";
-		System.out.println(file);
+			URL url;
+			InputStream is = null;
+			BufferedReader br;
+			String line;
 
-		CSVReader reader = new CSVReader(new FileReader(file), ';');
-		String[] nextLine;
-		while ((nextLine = reader.readNext()) != null) {
-			String user = nextLine[0];			
-			String page = getPage("http://www.tripadvisor.com.br/members-reviews/" + user); 
-			String local = Find.findRegex(page, "<div class=\"memberLoc\">(.+?)</div>");
-			String desde = Find.findRegex(page, "<div class=\"memberSince\">Desde (.+?)</div>");
-			String avaliacoes = Find.findRegex(page, "<span class=\"sprite-lhnselected\">Avaliações \\((.+?)\\)</span>");		
-			
-			int count  = 0;
-			int pagina = 1;
-			
-			while (temAvaliacao(user, pagina++)){
-			
-			List<String> lista_ava = Find.findLines(page, "<a href=\"/Hotel_Review-", "\">");
-			for (String string : lista_ava) {
-				System.out.println(string);
-				count++;
+			String file = System.getProperty("user.home") + "/Dropbox/Doutorado/experimentos/tripadvisor/hoteis.csv";
+			System.out.println(file);
+
+			CSVReader reader = new CSVReader(new FileReader(file), ';');
+			String[] nextLine;
+
+			while ((nextLine = reader.readNext()) != null) {
+				String user = nextLine[0];
+				if (!DB.hasUser(user)) {
+					String page = getPage("http://www.tripadvisor.com.br/members-reviews/" + user);
+					if (page != null) {
+						String local = Find.findRegex(page, "<div class=\"memberLoc\">(.+?)</div>");
+						String desde = Find.findRegex(page, "<div class=\"memberSince\">Desde (.+?)</div>");
+						String avaliacoes = Find.findRegex(page, "<span class=\"sprite-lhnselected\">Avaliações \\((.+?)\\)</span>");
+						int count = 0;
+						int pagina = 1;				
+						List<String> list = new ArrayList<String>();
+						do {
+							list.addAll(Find.findLines(page, "<a href=\"/Hotel_Review-", "\">"));							
+						}while (temAvaliacao(user, page, ++pagina));
+						
+						for (String string : list) {
+							String p2 = getPage("http://www.tripadvisor.com.br/Hotel_Review-" + string);
+							System.out.println(p2);
+						}
+						
+						
+						DB.addUser(user);						
+					}
+				}
 			}
-
-			WriteCSV.add(user+";"+local+";"+desde+";"+avaliacoes);
-			
-			
-			
-//			<a href="/members-reviews/Vilane_GS?offset=2">Mais avaliações</a>
-			
-			
-			
-			System.out.println(local);
-			
+			reader.close();
 		}
-		reader.close();
-		WriteCSV.close();
 
 	}
 
-}
-
 	private static String getPage(String path) {
-		try{
-			URL url = new URL(path);		
+		try {
+			URL url = new URL(path);
+			System.out.println(url);
 			InputStream is;
 			is = url.openStream(); // throws an IOException
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -76,16 +74,14 @@ public class TripadvisorUserCrawler {
 				sb.append(line).append("\n");
 			}
 			return sb.toString();
-		}catch(Exception e){
+		} catch (Exception e) {
 			System.err.println(path);
 			return null;
-		}		
+		}
 	}
 
-	private static boolean temAvaliacao(String user, int pagina) {
-		String page = getPage("http://www.tripadvisor.com.br/members-reviews/" +  user + "?offset=" + pagina);
-		int count = Find.countFindRegex(page, "<a href=\"/(.+?)_Review");
-		return false;
+	private static boolean temAvaliacao(String user, String page, int pagina) {
+		page = getPage("http://www.tripadvisor.com.br/members-reviews/" + user + "?offset=" + pagina);
+		return (Find.countFindRegex(page, "Mais avaliações(.+?)a>") > 0 );
 	}
 }
-	
