@@ -30,7 +30,7 @@ public class TripadvisorCrawler extends WebCrawler {
 	public boolean shouldVisit(WebURL url) {
 		String href = url.getURL().toLowerCase();
 
-		return !FILTERS.matcher(href).matches() && (url.getURL().startsWith("http://www.tripadvisor.com.br/Hotels-") || url.getURL().startsWith("http://www.tripadvisor.com.br/Hotel_Review"));
+		return !FILTERS.matcher(href).matches() && (url.getURL().startsWith("http://www.tripadvisor.com.br/Restaurants-g303441-Curitiba") || url.getURL().startsWith("http://www.tripadvisor.com.br"));
 	}
 
 	@Override
@@ -38,23 +38,27 @@ public class TripadvisorCrawler extends WebCrawler {
 		try {
 			String url = page.getWebURL().getURL();
 			System.out.println(url);
+			
+			
 			String contentDate = new String(page.getContentData());
 
-			String hotel = Find.findRegex(contentDate, "Hotel_Review-(.+?).html");
-			if (hotel.length() > 0 && !vendedores.contains(hotel)) {
+			String restaurante = Find.findRegex(contentDate, "Restaurant_Review-(.+?).html");
+			
+			if (restaurante.length() > 0 && !vendedores.contains(restaurante)) {
+				WriteCSV.add(restaurante);
 				
-				String estrelas = Find.findRegex(contentDate, "content=\"(.+?)\"");
-				String local = Find.findRegex(url, "_State_of(.+?).html");
-				
-				String avaliacoes = Find.findRegex(contentDate, "<span property=\"v:count\">(.+?)<\\/span>");
-				
-				
-				if (estrelas.length() > 0 && local.length() > 0 && avaliacoes.length() > 0) {
-					System.out.println(count++ + ":" + url);
-					vendedores.add(hotel);
-					System.err.println(count + "     " + hotel);
-					WriteCSV.add(hotel+ ";" + estrelas + ";" + local + ";" + avaliacoes);
-				}
+//				String estrelas = Find.findRegex(contentDate, "content=\"(.+?)\"");
+//				String local = Find.findRegex(url, "_State_of(.+?).html");
+//				
+//				String avaliacoes = Find.findRegex(contentDate, "<span property=\"v:count\">(.+?)<\\/span>");
+//				
+//				
+//				if (estrelas.length() > 0 && local.length() > 0 && avaliacoes.length() > 0) {
+//					System.out.println(count++ + ":" + url);
+//					vendedores.add(hotel);
+//					System.err.println(count + "     " + hotel);
+//					WriteCSV.add(hotel+ ";" + estrelas + ";" + local + ";" + avaliacoes);
+//				}
 			}
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
@@ -65,7 +69,7 @@ public class TripadvisorCrawler extends WebCrawler {
 	public static void main(String[] args) throws Exception {
 		WriteCSV.open("/tmp/hoteis.csv");
 		String crawlStorageFolder = LemasConfig.crawlStorageFolder;
-		int numberOfCrawlers = 3;
+		int numberOfCrawlers = 1;
 
 		CrawlConfig config = new CrawlConfig();
 		config.setCrawlStorageFolder(crawlStorageFolder);
@@ -75,7 +79,7 @@ public class TripadvisorCrawler extends WebCrawler {
 		LemasRobotstxtServer robotstxtServer = new LemasRobotstxtServer(robotstxtConfig, pageFetcher);
 		CrawlController controller = new CrawlController(config, pageFetcher, robotstxtServer);
 
-		controller.addSeed("http://www.tripadvisor.com.br/Hotels-g303638-Aracaju_State_of_Sergipe-Hotels.html");
+		controller.addSeed("http://www.tripadvisor.com.br/Restaurants-g303441-Curitiba_State_of_Parana.html");
 		controller.start(TripadvisorCrawler.class, numberOfCrawlers);
 		System.out.println("TERMINOU");
 		WriteCSV.close();

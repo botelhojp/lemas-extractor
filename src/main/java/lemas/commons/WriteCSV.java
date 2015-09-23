@@ -23,7 +23,7 @@ public class WriteCSV {
 
 	public synchronized static void add(String value) {
 		writer.println(value);
-//		if (count++ % 50 == 0) {
+//		if (count++ % 10 == 0) {
 			System.out.println("write:" + file);
 			close();
 			open(file);
