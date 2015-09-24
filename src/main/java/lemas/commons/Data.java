@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
@@ -438,5 +439,26 @@ public class Data {
 			return 0.0;
 		}
 
+	}
+	
+	
+	public static String getUrl(String _url) {
+		StringBuffer sb = new StringBuffer();
+		URL url;
+		try {
+			url = new URL(_url);
+			InputStream is = url.openConnection().getInputStream();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				sb.append(line).append("\n");
+			}
+			reader.close();
+			return sb.toString();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
