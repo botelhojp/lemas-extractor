@@ -28,14 +28,14 @@ public class Find {
 	
 	public static String findRegex(String contentDate, String pattern) {	
 		if (contentDate == null){
-			return null;
+			return "";
 		}
 		Pattern MY_PATTERN = Pattern.compile(pattern, Pattern.MULTILINE);
 		Matcher m = MY_PATTERN.matcher(contentDate);
 		while (m.find()) {
 			return m.group(1);
 		}
-		return null;
+		return "";
 	}
 	
 	public static int countFindRegex(String contentDate, String pattern) {		

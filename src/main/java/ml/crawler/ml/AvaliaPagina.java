@@ -10,7 +10,7 @@ public class AvaliaPagina {
 	public static void main(String[] args) {
 		File file = new File("/tmp/test.html");
 		file.delete();
-		String urlContent = Data.getUrl("http://www.tripadvisor.com.br/Restaurant_Review-g303506-d7729792-Reviews-or20-Restaurante_Visual-Rio_de_Janeiro_State_of_Rio_de_Janeiro.html#REVIEWS");
+		String urlContent = Data.getUrl("http://www.tripadvisor.com.br/Restaurant_Review-g303632-d4025776-Reviews-or20-Pio_Montes-Sorocaba_State_of_Sao_Paulo.html#REVIEWS");
 		WriteCSV.open(file.getAbsolutePath());
 		WriteCSV.add(urlContent);
 		WriteCSV.close();

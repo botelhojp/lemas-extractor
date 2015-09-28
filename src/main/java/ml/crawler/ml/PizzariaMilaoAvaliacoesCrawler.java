@@ -1,15 +1,13 @@
 package ml.crawler.ml;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashSet;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
+import au.com.bytecode.opencsv.CSVReader;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.crawler.Page;
@@ -17,7 +15,6 @@ import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 import edu.uci.ics.crawler4j.url.WebURL;
-import lemas.commons.Data;
 import lemas.commons.Find;
 import lemas.commons.LemasConfig;
 import lemas.commons.LemasRobotstxtServer;
@@ -26,8 +23,7 @@ import lemas.commons.WriteCSV;
 public class PizzariaMilaoAvaliacoesCrawler extends WebCrawler {
 
 	private final static Pattern FILTERS = Pattern.compile(LemasConfig.filter);
-	private static int count = 0;
-	private static Set<String> vendedores = new HashSet<String>();
+	private static int avaliacoesTotal = 0;
 
 	public PizzariaMilaoAvaliacoesCrawler() {
 		System.out.println("Iniciando o Crawller");
@@ -52,67 +48,97 @@ public class PizzariaMilaoAvaliacoesCrawler extends WebCrawler {
 	@Override
 	public void visit(Page page) {
 		try {
-			WriteCSV.open("/tmp/tmp.html");
-
 			String url = page.getWebURL().getURL();
 			System.out.println(url);
 
-			String urlContent = Data.getUrl(url);
-
 			String contentDate = new String(page.getContentData());
-			WriteCSV.add(urlContent);
-			WriteCSV.close();
-			System.out.println("\ttamnho:" + contentDate.length());
-			System.out.println("\tprimeiro:" + Find.findRegex(contentDate, "<span class='noQuotes'>(.+?)</span>"));
 			List<String> avaliacoes = Find.findLines(contentDate, "<div class=\"review", "<span class=\"isHelpful\">");
 			System.out.println("\t" + avaliacoes.size() + " avaliações.");
-			if (avaliacoes.size() == 6) {
-				System.out.println("vai");
-				System.out.println(contentDate);
-			}
+			avaliacoesTotal += avaliacoes.size();
 			for (String avaliacao : avaliacoes) {
-				String frase = Find.findRegex(avaliacao, "<span class='noQuotes'>(.+?)</span>");
-				System.out.println("\t" + frase);
+				String comments = Find.findRegex(avaliacao, "<span class='noQuotes'>(.+?)</span>");
+				String valor = Find.findRegex(avaliacao, "<img class=\"sprite-rating_s_fill rating_s_fill s(.+?)0\"");
+				String user = Find.findRegex(avaliacao, "user_name_name_click'\\)\">(.+?)</span>");
+				String server = Find.findRegex(url, "_Review-(.+?)-Reviews-");
+				String data = Find.findRegex(avaliacao, "<span class=\"ratingDate\">Avaliou em (.+?)\n").replace("</span></div> </div>", "");
+//				String confianca_revidor = Find.findRegex(avaliacao, "<span class=\"badgeText\">\n(.+?) votos");
+				String revisor_local = Find.findRegex(avaliacao, "<div class=\"location\">\n(.+?)\n</div>").replace("</div>", "null");
+				String save = "\"" + user + "\",\"" + server + "\",\"" + convertDate(data) + "\",\"" + "general" + "\",\"" + getCost(server) + "\",\"" + revisor_local + "\",\"" + comments + "\",\"" + getValue(valor) + "\"";
+				WriteCSV.add(save);
+				System.out.println(save);
 			}
-
-			// String restaurante = Find.findRegex(contentDate,
-			// "Restaurant_Review-(.+?).html");
-
-			// if (restaurante.length() > 0 &&
-			// !vendedores.contains(restaurante)) {
-			// WriteCSV.add(restaurante);
-
-			// String estrelas = Find.findRegex(contentDate,
-			// "content=\"(.+?)\"");
-			// String local = Find.findRegex(url, "_State_of(.+?).html");
-			//
-			// String avaliacoes = Find.findRegex(contentDate, "<span
-			// property=\"v:count\">(.+?)<\\/span>");
-			//
-			//
-			// if (estrelas.length() > 0 && local.length() > 0 &&
-			// avaliacoes.length() > 0) {
-			// System.out.println(count++ + ":" + url);
-			// vendedores.add(hotel);
-			// System.err.println(count + " " + hotel);
-			// WriteCSV.add(hotel+ ";" + estrelas + ";" + local + ";" +
-			// avaliacoes);
-			// }
-			// }
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
 		}
 	}
 
-	
+	private String getCost(String server) {
+		if (values.containsKey(server)) {
+			return values.get(server);
+		}
+		return "ERROR";
+	}
 
-	public static String[] listRest = { "g187849-d833443"
-			// "g187849-d784583"
-	};
+	private String getValue(String valor) {
+		int v = Integer.parseInt(valor);
+		switch (v) {
+		case 1:
+			return "Horrível";
+		case 2:
+			return "Ruim";
+		case 3:
+			return "Razoável";
+		case 4:
+			return "Muito_bom";
+		case 5:
+			return "Excelente";
+		default:
+			return "ERROR";
+		}
+	}
+
+	private String convertDate(String data) {
+		data = data.replace(" de Janeiro de ", "/01/");
+		data = data.replace(" de Fevereiro de ", "/02/");
+		data = data.replace(" de Março de ", "/03/");
+		data = data.replace(" de Abril de ", "/04/");
+		data = data.replace(" de Maio de ", "/05/");
+		data = data.replace(" de Junho de ", "/06/");
+		data = data.replace(" de Julho de ", "/07/");
+		data = data.replace(" de Agosto de ", "/08/");
+		data = data.replace(" de Setembro de ", "/09/");
+		data = data.replace(" de Outubro de ", "/10/");
+		data = data.replace(" de Novembro de ", "/11/");
+		data = data.replace(" de Dezembro de ", "/12/");
+		data = data.replace("de", "ERROR");
+		return data;
+	}
+
+	public static List<String> listRest = load();
+	public static Hashtable<String, String> values;
 
 	public static void main(String[] args) throws Exception {
-		WriteCSV.open("/tmp/hoteis.csv");
+		String filepath =  System.getProperty("user.home") + "/Dropbox/Doutorado/experimentos/tripadvisor/avaliacoes_resta_sao_paulo.csv";
+		File file = new File(filepath);
+		if (file.exists()) {
+			file.delete();
+		}
+		WriteCSV.open(filepath);
+		WriteCSV.add("% Feedbacks");
+		WriteCSV.add("");
+		WriteCSV.add("@RELATION feedbacks");
+		WriteCSV.add("@ATTRIBUTE client string");
+		WriteCSV.add("@ATTRIBUTE server string");
+		WriteCSV.add("@ATTRIBUTE date date dd/MM/yyyy");
+		WriteCSV.add("@ATTRIBUTE context string");
+		WriteCSV.add("@ATTRIBUTE cost real");
+		WriteCSV.add("@ATTRIBUTE local string");
+		WriteCSV.add("@ATTRIBUTE comments string");
+		WriteCSV.add("@ATTRIBUTE feedback { Excelente, Muito_bom, Razoável, Ruim , Horrível }");
+		WriteCSV.add("");
+		WriteCSV.add("@DATA");
+
 		String crawlStorageFolder = LemasConfig.crawlStorageFolder;
 		int numberOfCrawlers = 1;
 
@@ -129,7 +155,30 @@ public class PizzariaMilaoAvaliacoesCrawler extends WebCrawler {
 		}
 
 		controller.start(PizzariaMilaoAvaliacoesCrawler.class, numberOfCrawlers);
-		System.out.println("TERMINOU");
+		System.out.println("TERMINOU com " + avaliacoesTotal + " avaliações.");
 		WriteCSV.close();
+	}
+
+	private static List<String> load() {
+		values = new Hashtable<String, String>();
+		try {
+			List<String> r = new ArrayList<String>();
+			File file = new File(System.getProperty("user.home") + "/Dropbox/Doutorado/experimentos/tripadvisor/restaurantes_sao_paulo.csv");
+			CSVReader reader = new CSVReader(new FileReader(file), ';');
+			String[] nextLine;
+			while ((nextLine = reader.readNext()) != null) {
+				String server = nextLine[0];
+				String value = nextLine[2];
+				if (!values.containsKey(server)) {
+					values.put(server, value);
+				}
+				r.add(server);
+			}
+			reader.close();
+			return r;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

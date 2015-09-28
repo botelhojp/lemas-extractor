@@ -19,7 +19,6 @@ import edu.uci.ics.crawler4j.url.WebURL;
 public class TripadvisorCrawler extends WebCrawler {
 
 	private final static Pattern FILTERS = Pattern.compile(LemasConfig.filter);
-	private static int count = 0;
 	private static Set<String> vendedores = new HashSet<String>();
 
 	public TripadvisorCrawler() {

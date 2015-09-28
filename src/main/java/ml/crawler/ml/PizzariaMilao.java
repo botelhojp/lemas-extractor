@@ -12,9 +12,8 @@ import lemas.commons.WriteCSV;
 public class PizzariaMilao {
 
 	public static void main(String[] args) throws IOException {
-		WriteCSV.open("/tmp/pizzarias_milao.csv");
-		String file = System.getProperty("user.home")
-				+ "/Dropbox/Doutorado/experimentos/tripadvisor/pizzarias_milao.txt";
+		WriteCSV.open(System.getProperty("user.home") + "/Dropbox/Doutorado/experimentos/tripadvisor/restaurantes_sao_paulo.csv");
+		String file = System.getProperty("user.home") + "/Dropbox/Doutorado/experimentos/tripadvisor/restaurantes_sao_paulo.txt";
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		try {
 			StringBuilder sb = new StringBuilder();
@@ -41,12 +40,8 @@ public class PizzariaMilao {
 					WriteCSV.add(sb.toString());
 					sb = new StringBuilder();
 				}
-
-				// sb.append(line);
-				// sb.append(System.lineSeparator());
 				line = br.readLine();
 			}
-			String everything = sb.toString();
 		} finally {
 			br.close();
 		}
@@ -79,7 +74,7 @@ public class PizzariaMilao {
 
 	public static boolean isNumeric(String str) {
 		try {
-			double d = Double.parseDouble(str);
+			Double.parseDouble(str);
 		} catch (NumberFormatException nfe) {
 			return false;
 		}
