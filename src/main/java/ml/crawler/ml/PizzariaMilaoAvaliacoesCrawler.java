@@ -58,11 +58,11 @@ public class PizzariaMilaoAvaliacoesCrawler extends WebCrawler {
 			for (String avaliacao : avaliacoes) {
 				String comments = Find.findRegex(avaliacao, "<span class='noQuotes'>(.+?)</span>");
 				String valor = Find.findRegex(avaliacao, "<img class=\"sprite-rating_s_fill rating_s_fill s(.+?)0\"");
-				String user = Find.findRegex(avaliacao, "user_name_name_click'\\)\">(.+?)</span>");
+				String user = Find.findRegex(avaliacao, "user_name_name_click'\\)\">(.+?)</span>").replace(" ", "-");
 				String server = Find.findRegex(url, "_Review-(.+?)-Reviews-");
 				String data = Find.findRegex(avaliacao, "<span class=\"ratingDate\">Avaliou em (.+?)\n").replace("</span></div> </div>", "");
 //				String confianca_revidor = Find.findRegex(avaliacao, "<span class=\"badgeText\">\n(.+?) votos");
-				String revisor_local = Find.findRegex(avaliacao, "<div class=\"location\">\n(.+?)\n</div>").replace("</div>", "null");
+				String revisor_local = Find.findRegex(avaliacao, "<div class=\"location\">\n(.+?)\n</div>").replace("</div>", "null").replace(",", ":");
 				String save = "\"" + user + "\",\"" + server + "\",\"" + convertDate(data) + "\",\"" + "general" + "\",\"" + getCost(server) + "\",\"" + revisor_local + "\",\"" + comments + "\",\"" + getValue(valor) + "\"";
 				WriteCSV.add(save);
 				System.out.println(save);
@@ -140,7 +140,7 @@ public class PizzariaMilaoAvaliacoesCrawler extends WebCrawler {
 		WriteCSV.add("@DATA");
 
 		String crawlStorageFolder = LemasConfig.crawlStorageFolder;
-		int numberOfCrawlers = 1;
+		int numberOfCrawlers = 10;
 
 		CrawlConfig config = new CrawlConfig();
 		config.setCrawlStorageFolder(crawlStorageFolder);
@@ -170,7 +170,7 @@ public class PizzariaMilaoAvaliacoesCrawler extends WebCrawler {
 				String server = nextLine[0];
 				String value = nextLine[2];
 				if (!values.containsKey(server)) {
-					values.put(server, value);
+					values.put(server, value.replace(",", "."));
 				}
 				r.add(server);
 			}
