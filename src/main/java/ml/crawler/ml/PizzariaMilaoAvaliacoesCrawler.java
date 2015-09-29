@@ -60,7 +60,7 @@ public class PizzariaMilaoAvaliacoesCrawler extends WebCrawler {
 				String valor = Find.findRegex(avaliacao, "<img class=\"sprite-rating_s_fill rating_s_fill s(.+?)0\"");
 				String user = Find.findRegex(avaliacao, "user_name_name_click'\\)\">(.+?)</span>").replace(" ", "-");
 				String server = Find.findRegex(url, "_Review-(.+?)-Reviews-");
-				String data = Find.findRegex(avaliacao, "<span class=\"ratingDate\">Avaliou em (.+?)\n").replace("</span></div> </div>", "");
+				String data = Find.findRegex(avaliacao, "<span class=\"ratingDate\">Avaliou em (.+?)\n").replace("</span></div> </div>", "").trim();
 //				String confianca_revidor = Find.findRegex(avaliacao, "<span class=\"badgeText\">\n(.+?) votos");
 				String revisor_local = Find.findRegex(avaliacao, "<div class=\"location\">\n(.+?)\n</div>").replace("</div>", "null").replace(",", ":");
 				String save = "\"" + user + "\",\"" + server + "\",\"" + convertDate(data) + "\",\"" + "general" + "\",\"" + getCost(server) + "\",\"" + revisor_local + "\",\"" + comments + "\",\"" + getValue(valor) + "\"";
@@ -112,6 +112,9 @@ public class PizzariaMilaoAvaliacoesCrawler extends WebCrawler {
 		data = data.replace(" de Novembro de ", "/11/");
 		data = data.replace(" de Dezembro de ", "/12/");
 		data = data.replace("de", "ERROR");
+		if (data.length() ==  9){
+			data = "0" + data;
+		}
 		return data;
 	}
 
